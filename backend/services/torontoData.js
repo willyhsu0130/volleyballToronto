@@ -1,67 +1,49 @@
-// The below code is copy and pasted from https://open.toronto.ca/dataset/registered-programs-and-drop-in-courses-offering/
+// services/torontoData.js
+import https from "https";
 
-import https from "https"
 const packageId = "1a5be46a-4039-48cd-a2d2-8e702abf9516";
 
-// promise to retrieve the package
-const getPackage = new Promise((resolve, reject) => {
-    https.get(`https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/package_show?id=${packageId}`, (response) => {
-        let dataChunks = [];
-        response
-            .on("data", (chunk) => {
-                dataChunks.push(chunk)
-            })
-            .on("end", () => {
-                let data = Buffer.concat(dataChunks)
-                resolve(JSON.parse(data.toString())["result"])
-            })
-            .on("error", (error) => {
-                reject(error)
-            })
+// helper to fetch JSON from a URL
+function fetchJSON(url) {
+    return new Promise((resolve, reject) => {
+        https.get(url, (res) => {
+            const chunks = [];
+            res.on("data", (c) => chunks.push(c));
+            res.on("end", () => {
+                try {
+                    const json = JSON.parse(Buffer.concat(chunks).toString());
+                    resolve(json);
+                } catch (e) {
+                    reject(e);
+                }
+            });
+            res.on("error", reject);
+        });
     });
-});
+}
 
-getPackage.then(pkg => {
-    // this is the metadata of the package
-    //console.log(pkg);
-}).catch(error => {
-    console.error(error);
-})
+// main function: get drop-ins from the dataset
+export async function getTorontoData() {
+    // 1. Get package metadata
+    const { result } = await fetchJSON(
+        `https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/package_show?id=${packageId}`
+    );
 
-// since this package has resources in the datastore, one can get the data rather than just the metadata of the resources
-// promise to retrieve data of a datastore resource 
+    // 2. Find datastore resources
+    const datastoreResources = result.resources.filter((r) => r.datastore_active);
 
-const getDatastoreResource = resource => new Promise((resolve, reject) => {
-    https.get(`https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/datastore_search?id=${resource["id"]}`, (response) => {
-        let dataChunks = [];
-        response
-            .on("data", (chunk) => {
-                dataChunks.push(chunk)
-            })
-            .on("end", () => {
-                let data = Buffer.concat(dataChunks)
-                resolve(JSON.parse(data.toString())["result"]["records"])
-            })
-            .on("error", (error) => {
-                reject(error)
-            })
-    })
-});
+    // 3. Get one of the resources (drop-ins as example)
+    const { result: dropResult } = await fetchJSON(
+        `https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/datastore_search?id=${datastoreResources[0].id}&limit=5000`
+    );
 
-// get the package information again
-getPackage.then(pkg => {
-    // get the datastore resources for the package
-    let datastoreResources = pkg["resources"].filter(r => r.datastore_active);
+    const { result: locationResult } = await fetchJSON(
+        `https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/datastore_search?id=${datastoreResources[1].id}&limit=5000`
+    );
 
-    // retrieve the first datastore resource as an example
-    getDatastoreResource(datastoreResources[1])
-        .then(resource => {
-            // this is the actual data of the resource
-            // console.log(resource)
-        })
-        .catch(error => {
-            console.error(error);
-        })
-}).catch(error => {
-    console.error(error);
-})
+    // 4. Return the records
+    return {
+        dropResult: dropResult.records,
+        locationResult: locationResult.records
+    };
+}

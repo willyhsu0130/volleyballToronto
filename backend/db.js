@@ -3,9 +3,7 @@
 
 
 import mongoose from "mongoose";
-import { pullTorontoPackage } from "./services/torontoData.js";
-import { Location } from "./models/location.js";
-import { DropIns } from "./models/DropIns.js";
+import { getTorontoData } from "./services/torontoData.js";
 import { configDotenv } from "dotenv";
 
 configDotenv()
@@ -16,18 +14,8 @@ export async function connectDB() {
 }
 
 export const updateFromToronto = async () =>{
-    const pkg = await pullTorontoPackage()
+    const {dropResult, locationResult} = await getTorontoData()
     // Test if pullTorontoPackage work here
-    console.log(pkg, "pkg works")
-    const datastoreResources = pkg.resources.filter((r) => r.datastore_active);
+    console.log(dropResult, locationResult)
 
-    // Drop-ins
-    const dropins = await getDatastoreResource(datastoreResources[1]);
-    //   await DropIn.insertMany(dropins, { ordered: false }).catch(() => {});
-    //   console.log(`Synced ${dropins.length} drop-ins`);
-
-    // Locations
-    const locations = await getDatastoreResource(datastoreResources[0]);
-    //   await Location.insertMany(locations, { ordered: false }).catch(() => {});
-    //   console.log(`Synced ${locations.length} locations`);
 }
