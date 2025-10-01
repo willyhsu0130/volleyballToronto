@@ -136,6 +136,7 @@ export const getSportFromDB = async ({
     // Example time filter
     if (timeBegin) filter.StartHour = { $gte: Number(timeBegin) };
     if (timeEnd) filter.EndHour = { $lte: Number(timeEnd) };
+    if (location) filter.LocationName = new RegExp(`^${location}$`, "i"); 
 
     console.log("Final filter:", filter);
 
@@ -145,6 +146,26 @@ export const getSportFromDB = async ({
         )
 
 
-    
     return results;
+};
+// q is a string rn.
+
+export const getLocations = async ({q, nameOnly}) => {
+  // Build filter object
+  const filter = q
+    ? { LocationName: { $regex: q, $options: "i" } } // case-insensitive search
+    : {};
+
+  // Base query
+  let query = Location.find(filter);
+
+  // If we only want name + id
+  if (nameOnly) {
+    query = query.select("LocationName _id"); 
+    // Or "LocationName LocationId" if you have your own LocationId field
+  }
+
+  // Limit results to avoid returning all 35k
+  const results = await query.limit(50).lean();
+  return results;
 };
