@@ -34,16 +34,35 @@ export async function getTorontoData() {
 
     // 3. Get one of the resources (drop-ins as example)
     const { result: dropResult } = await fetchJSON(
-        `https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/datastore_search?id=${datastoreResources[0].id}&limit=5000`
+        `https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/datastore_search?id=${datastoreResources[1].id}&limit=5000`
     );
 
     const { result: locationResult } = await fetchJSON(
-        `https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/datastore_search?id=${datastoreResources[1].id}&limit=5000`
+        `https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/datastore_search?id=${datastoreResources[0].id}&limit=5000`
     );
 
     // 4. Return the records
     return {
-        dropResult: dropResult.records,
-        locationResult: locationResult.records
+        APIdropResults: transformApiResponse(dropResult.records),
+        APIlocationResults: transformApiResponse(locationResult.records)
     };
+}
+
+const normalizeKeys = (obj) => {
+  const newObj = {};
+  for (const [key, value] of Object.entries(obj)) {
+    // remove spaces and underscores from keys
+    const cleanKey = key
+      .replace(/\s+/g, '')  // remove spaces
+      .replace(/_/g, '');   // remove underscores
+
+    newObj[cleanKey] = value;
+  }
+  return newObj;
+}
+
+const transformApiResponse = (apiResponse) =>{
+  // API sends { '0': {...}, '1': {...}, ... }
+  // Turn it into an array and normalize keys for each item
+  return Object.values(apiResponse).map(normalizeKeys);
 }
