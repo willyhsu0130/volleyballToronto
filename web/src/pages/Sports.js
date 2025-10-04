@@ -161,7 +161,7 @@ const SearchBar = ({
         <select
           name="location"
           className="flex-1 px-2 py-2 border rounded "
-          onChange={handleOnChange}>
+          onChange="">
           <option value="">Location</option>
         </select>
       </div>
