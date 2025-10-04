@@ -29,9 +29,6 @@ export async function connectDB() {
 
 export const updateFromToronto = async () => {
     const { APIdropResults, APIlocationResults } = await getTorontoData()
-    // console.log(APIdropResults)
-    // console.log(APIlocationResults)
-
 
     // Check if we got a result
     if (!Array.isArray(APIlocationResults) || !Array.isArray(APIdropResults)) {
@@ -64,7 +61,6 @@ export const updateFromToronto = async () => {
                     },
                     { upsert: true }
                 )
-                console.log(response)
             }
         } catch (err) {
             return (err)
@@ -75,6 +71,21 @@ export const updateFromToronto = async () => {
     const updateDBDropIn = async () => {
         try {
             for (const APIdropResult of APIdropResults) {
+                // Use a start date and time object instead of hours
+                const { FirstDate, StartHour, StartMinute, LastDate, EndHour, EndMinute } = APIdropResult
+
+                const beginDate = dateDataMerge({
+                    date: FirstDate,
+                    hour: StartHour,
+                    minute: StartMinute
+                })
+                const endDate = dateDataMerge({
+                    date: LastDate,
+                    hour: EndHour,
+                    minute: EndMinute
+                })
+
+
                 const locationDoc = await Location.findOne({ LocationId: APIdropResult.LocationID })
                 const response = await DropIn.updateOne(
                     { DropInId: APIdropResult.id },
@@ -88,84 +99,91 @@ export const updateFromToronto = async () => {
                             Section: APIdropResult.Section,
                             AgeMin: APIdropResult.AgeMin,
                             AgeMax: APIdropResult.AgeMax,
-                            DateRange: APIdropResult.DateRange,
-                            StartHour: APIdropResult.StartHour,
-                            StartMinute: APIdropResult.StartMinute,
-                            EndHour: APIdropResult.EndHour,
-                            EndMinute: APIdropResult.EndMinute,
-                            FirstDate: APIdropResult.FirstDate,
-                            LastDate: APIdropResult.LastDate,
+                            BeginDate: beginDate,
+                            EndDate: endDate
                         }
                     },
                     { upsert: true }
                 )
             }
+
         } catch (err) {
+            console.log(err)
             return err
         }
-
     }
 
-    const response1 = await updateDBLocation()
+    // const response1 = await updateDBLocation()
     const response2 = await updateDBDropIn()
-
     return "Succesfully Updated DB"
 }
 
 
 export const getSportFromDB = async ({
     sport,
-    dateBegin,
-    dateEnd,
-    timeBegin,
-    timeEnd,
+    beginDate,
+    endDate,
     location
 }) => {
     const filter = {};
 
     if (sport) filter.CourseTitle = sport;
-    if (location) filter.LocationId = location;
 
-    // Example date filter (if your DB stores FirstDate/LastDate as Date objects)
-    if (dateBegin || dateEnd) {
-        filter.FirstDate = {};
-        if (dateBegin) filter.FirstDate.$gte = new Date(dateBegin);
-        if (dateEnd) filter.FirstDate.$lte = new Date(dateEnd);
+    // Location filter (by name, case-insensitive)
+    if (location) {
+        filter.LocationName = new RegExp(location, "i");
     }
 
-    // Example time filter
-    if (timeBegin) filter.StartHour = { $gte: Number(timeBegin) };
-    if (timeEnd) filter.EndHour = { $lte: Number(timeEnd) };
-    if (location) filter.LocationName = new RegExp(`^${location}$`, "i"); 
+    // Date filter
+    if (beginDate || endDate) {
+        filter.BeginDate = {};
+        if (beginDate) filter.BeginDate.$gte = new Date(beginDate);
+        if (endDate) filter.BeginDate.$lte = new Date(endDate);
+    }
 
     console.log("Final filter:", filter);
 
     const results = await DropIn.find(filter)
-        .populate(
-            "LocationRef", "LocationName District StreetName StreetType"
-        )
-
-
+        .populate("LocationRef", "LocationName District StreetName StreetType")
+        .sort({ BeginDate: 1 });
     return results;
 };
 // q is a string rn.
 
-export const getLocations = async ({q, nameOnly}) => {
-  // Build filter object
-  const filter = q
-    ? { LocationName: { $regex: q, $options: "i" } } // case-insensitive search
-    : {};
+export const getLocations = async ({ q, nameOnly }) => {
+    // Build filter object
+    const filter = q
+        ? { LocationName: { $regex: q, $options: "i" } } // case-insensitive search
+        : {};
 
-  // Base query
-  let query = Location.find(filter);
+    // Base query
+    let query = Location.find(filter);
 
-  // If we only want name + id
-  if (nameOnly) {
-    query = query.select("LocationName _id"); 
-    // Or "LocationName LocationId" if you have your own LocationId field
-  }
+    // If we only want name + id
+    if (nameOnly) {
+        query = query.select("LocationName _id");
+        // Or "LocationName LocationId" if you have your own LocationId field
+    }
 
-  // Limit results to avoid returning all 35k
-  const results = await query.limit(50).lean();
-  return results;
+    // Limit results to avoid returning all 35k
+    const results = await query.limit(50).lean();
+    return results;
+};
+
+
+const dateDataMerge = ({ date, hour, minute }) => {
+    if (!date) {
+        console.error("Missing date:", { date, hour, minute });
+        return null;
+    }
+
+    const returnDate = new Date(date);
+
+    if (isNaN(returnDate.getTime())) {
+        console.error("Invalid base date:", date);
+        return null;
+    }
+
+    returnDate.setHours(hour ?? 0, minute ?? 0, 0, 0);
+    return returnDate;
 };
