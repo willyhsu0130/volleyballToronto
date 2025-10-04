@@ -73,7 +73,6 @@ const SearchBar = ({
     }))
   }
 
-
   const handleDateChange = (e) => {
     const { name, value } = e.target;
 

@@ -9,7 +9,7 @@ import { DropIn } from "./models/DropIns.js";
 
 try {
     configDotenv()
-}catch (err){
+} catch (err) {
     console.log(err)
 }
 
@@ -134,7 +134,8 @@ export const getSportFromDB = async ({
     sport,
     beginDate,
     endDate,
-    location
+    location,
+    age
 }) => {
     const filter = {};
 
@@ -150,6 +151,13 @@ export const getSportFromDB = async ({
         filter.BeginDate = {};
         if (beginDate) filter.BeginDate.$gte = new Date(beginDate);
         if (endDate) filter.BeginDate.$lte = new Date(endDate);
+    }
+
+    // Age fitler
+
+    if (age) {
+        filter.AgeMin = { $lte: age };  // user’s age should be >= AgeMin
+        filter.AgeMax = { $gte: age };  // user’s age should be <= AgeMax
     }
 
     console.log("Final filter:", filter);
