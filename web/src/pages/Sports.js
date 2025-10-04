@@ -157,22 +157,45 @@ const SearchBar = ({
 
 
 const ResultCard = ({ item }) => {
-  const formattedDate = new Date(item.FirstDate).toLocaleDateString("en-CA", {
-    timeZone: "America/Toronto",
+
+  const begin = new Date(item.BeginDate);
+  const end = new Date(item.EndDate);
+
+
+  const formattedDate = begin.toLocaleDateString("en-US", {
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     weekday: "short",
     month: "short",
     day: "numeric",
-    year: "numeric"
+    year: "numeric",
   });
+
+  const formattedTime = `${begin.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit"
+  })} – ${end.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit"
+  })}`
 
   return (
     <div className="bg-white p-4 rounded shadow hover:shadow-md transition">
       <h3 className="font-bold text-lg">{item.CourseTitle}</h3>
       <p className="text-gray-700">{item.LocationName}</p>
-      <span className="text-sm text-gray-500">{formattedDate}</span>
+      <span className="text-sm text-gray-500 mr-4">
+        {formattedTime}
+      </span>
+      <span className="text-sm text-gray-500 mr-4">
+        {formattedDate}
+      </span>
+      <span className="text-sm text-gray-500">
+        {item.AgeMax === "None"
+          ? `${item.AgeMin}+`
+          : `${item.AgeMin}–${item.AgeMax}`}
+      </span>
     </div>
   );
-};
+}
 
 
 const ResultCards = ({ className, list }) => {
