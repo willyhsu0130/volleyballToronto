@@ -7,7 +7,12 @@ import { configDotenv } from "dotenv";
 import { Location } from "./models/Location.js";
 import { DropIn } from "./models/DropIns.js";
 
-configDotenv()
+try {
+    configDotenv()
+}catch (err){
+    console.log(err)
+}
+
 
 export async function connectDB() {
     try {
@@ -28,6 +33,7 @@ export async function connectDB() {
 }
 
 export const updateFromToronto = async () => {
+    console.log("updateFromToronto fired")
     const { APIdropResults, APIlocationResults } = await getTorontoData()
 
     // Check if we got a result
@@ -60,7 +66,9 @@ export const updateFromToronto = async () => {
                         }
                     },
                     { upsert: true }
+
                 )
+                console.log(response)
             }
         } catch (err) {
             return (err)
@@ -105,6 +113,7 @@ export const updateFromToronto = async () => {
                     },
                     { upsert: true }
                 )
+                console.log(response)
             }
 
         } catch (err) {
@@ -113,8 +122,10 @@ export const updateFromToronto = async () => {
         }
     }
 
-    // const response1 = await updateDBLocation()
+    const response1 = await updateDBLocation()
+    console.log("updateLocation response: ", response1)
     const response2 = await updateDBDropIn()
+    console.log("updateDropIn response: ", response2)
     return "Succesfully Updated DB"
 }
 
