@@ -166,19 +166,21 @@ const ResultCard = ({ item }) => {
 
 
   const formattedDate = begin.toLocaleDateString("en-US", {
-    timeZone: "America/Toronto", // ✅ always force Toronto
+    timeZone: "America/Toronto",
     weekday: "short",
     month: "short",
     day: "numeric",
     year: "numeric",
   });
 
+  console.log(formattedDate)
+
   const formattedTime = `${begin.toLocaleTimeString("en-US", {
-    timeZone: "America/Toronto", // ✅ must include this too
+    timeZone: "America/Toronto", 
     hour: "numeric",
     minute: "2-digit"
   })} – ${end.toLocaleTimeString("en-US", {
-    timeZone: "America/Toronto", // ✅ must include this too
+    timeZone: "America/Toronto", 
     hour: "numeric",
     minute: "2-digit"
   })}`;
