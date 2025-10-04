@@ -11,8 +11,12 @@ const PORT = process.env.PORT || 4000;
 
 const { dropResult } = await connectDB();
 
-// const updateFromTorontoResponse = await updateFromToronto();
-// console.log(updateFromTorontoResponse)
+// Function to update database
+const updateDB = async () => {
+  const updateFromTorontoResponse = await updateFromToronto();
+  console.log(updateFromTorontoResponse)
+}
+
 
 app.get("/", (req, res) => {
   res.send("<h1>Welcome, Express + MongoDB is working! </h1>");
