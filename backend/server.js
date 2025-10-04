@@ -30,7 +30,7 @@ app.get("/times/:sport", async (req, res) => {
       return res.status(400).json({ error: "Invalid sport parameter" });
     }
 
-    if(!age || typeof age !== "number"){
+    if(!age || typeof age !== "string"){
       return res.status(400).json({ error: "Invalid age parameter" })
     }
 
