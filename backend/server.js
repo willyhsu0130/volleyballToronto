@@ -23,18 +23,12 @@ app.listen(PORT, () => {
 app.get("/times/:sport", async (req, res) => {
   try {
     const sport = req.params.sport?.trim();
-    const { beginDate, endDate, location, age} = req.query;
+    const { beginDate, endDate, location, age } = req.query;
 
     // -------- Validation & Sanitization --------
     if (!sport || typeof sport !== "string") {
       return res.status(400).json({ error: "Invalid sport parameter" });
     }
-
-    if(!age || typeof age !== "string"){
-      return res.status(400).json({ error: "Invalid age parameter" })
-    }
-
-
 
     let parsedBeginDate = null;
     let parsedEndDate = null;
@@ -53,6 +47,13 @@ app.get("/times/:sport", async (req, res) => {
         return res.status(400).json({ error: "Invalid endDate" });
       }
       parsedEndDate = d.toISOString();
+    }
+
+    if (age) {
+      const parsedAge = Number(age);
+      if (isNaN(parsedAge)) {
+        return res.status(400).json({ error: "Age must be a number" });
+      }
     }
 
     let safeLocation = null;
