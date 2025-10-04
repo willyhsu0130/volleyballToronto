@@ -1,10 +1,6 @@
 import {
-  connectDB,
   updateFromToronto,
-} from "./backend/services/torontoData.js";
-
-
-const { dropResult } = await connectDB();
+} from "../backend/db.js";
 
 // Function to update database
 const updateDB = async () => {
