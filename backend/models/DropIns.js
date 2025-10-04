@@ -22,8 +22,8 @@ const dropInSchema = new mongoose.Schema({
   CourseId: { type: Number, required: true },
   CourseTitle: { type: String, required: true },       // Title of drop-in course
   Section: { type: String },                           // Section (if available)
-  AgeMin: { type: String },                            // Min age (in months)
-  AgeMax: { type: String },                            // Max age (in months)
+  AgeMin: { type: Number },                            // Min age (in months)
+  AgeMax: { type: Number },                            // Max age (in months)
   BeginDate: { type: Date },                           // First date course runs
   EndDate: { type: Date },                            // Last date course runs
 }, {

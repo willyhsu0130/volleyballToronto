@@ -61,8 +61,28 @@ const normalizeKeys = (obj) => {
   return newObj;
 }
 
-const transformApiResponse = (apiResponse) =>{
-  // API sends { '0': {...}, '1': {...}, ... }
-  // Turn it into an array and normalize keys for each item
-  return Object.values(apiResponse).map(normalizeKeys);
-}
+const transformApiResponse = (apiResponse) => {
+  return Object.values(apiResponse).map((record) => {
+    const normalized = normalizeKeys(record);
+
+    // Handle AgeMin
+    if (normalized.AgeMin) {
+      if (normalized.AgeMin === "None" || normalized.AgeMin.trim() === "") {
+        normalized.AgeMin = ""; // blank means no lower limit
+      } else if (!isNaN(normalized.AgeMin)) {
+        normalized.AgeMin = Number(normalized.AgeMin);
+      }
+    }
+
+    // Handle AgeMax
+    if (normalized.AgeMax) {
+      if (normalized.AgeMax === "None" || normalized.AgeMax.trim() === "") {
+        normalized.AgeMax = ""; // blank means no upper limit
+      } else if (!isNaN(normalized.AgeMax)) {
+        normalized.AgeMax = Number(normalized.AgeMax);
+      }
+    }
+
+    return normalized;
+  });
+};

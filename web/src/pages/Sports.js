@@ -1,5 +1,9 @@
 import { useState, useEffect, } from "react"
 
+const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API
+
+console.log(REACT_APP_SERVER_API)
+
 const Sports = () => {
   const [dropIns, setDropIns] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,7 +33,7 @@ const Sports = () => {
     if (filters.location) params.append("location", filters.location);
 
     // final URL (use sport as the path param)
-    const url = `https://volleyballtoronto.onrender.com/times/${filters.sport}?${params.toString()}`
+    const url = `${REACT_APP_SERVER_API}times/${filters.sport}?${params.toString()}`
     console.log("URL", url)
     fetch(url)
       .then((res) => res.json())
@@ -65,8 +69,8 @@ const SearchBar = ({
   setFilter
 }) => {
 
-  const handleAgeChange = (e) =>{
-    const {value} = e.target
+  const handleAgeChange = (e) => {
+    const { value } = e.target
     setFilter((prev) => ({
       ...prev,
       age: value
@@ -111,7 +115,7 @@ const SearchBar = ({
           name="query"
           placeholder="Search for sport, age, location, or community center..."
           className="w-full px-3 py-2 border border-black rounded"
-          onChange=""
+          onChange={() => { }}
         />
       </div>
 
@@ -134,7 +138,7 @@ const SearchBar = ({
         <select
           className="flex-1 px-2 py-2 border rounded "
           name="time"
-          onChange="">
+          onChange={() => { }}>
           <option value="">Time</option>
           <option value="morning">Morning (6am–12pm)</option>
           <option value="afternoon">Afternoon (12pm–5pm)</option>
@@ -160,7 +164,7 @@ const SearchBar = ({
         <select
           name="location"
           className="flex-1 px-2 py-2 border rounded "
-          onChange="">
+          onChange={() => { }}>
           <option value="">Location</option>
         </select>
       </div>
@@ -201,9 +205,9 @@ const ResultCard = ({ item }) => {
         {formattedDateTime} - {formattedEndTime}
       </span>
       <span className="text-sm text-gray-500">
-        {item.AgeMax === "None"
+        {item.AgeMax == null || item.AgeMax === 0
           ? `${item.AgeMin}+`
-          : `${item.AgeMin}-${item.AgeMax}`}
+          : `${item.AgeMin}–${item.AgeMax}`}
       </span>
     </div>
   );

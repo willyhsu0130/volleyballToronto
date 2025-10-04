@@ -153,11 +153,19 @@ export const getSportFromDB = async ({
         if (endDate) filter.BeginDate.$lte = new Date(endDate);
     }
 
-    // Age fitler
+    // Age filter
 
     if (age) {
-        filter.AgeMin = { $lte: age };  // user’s age should be >= AgeMin
-        filter.AgeMax = { $gte: age };  // user’s age should be <= AgeMax
+        filter.$and = [
+            { AgeMin: { $lte: age } },
+            {
+                $or: [
+                    { AgeMax: { $gte: age } },
+                    { AgeMax: { $exists: false } },
+                    { AgeMax: null },
+                ],
+            },
+        ];
     }
 
     console.log("Final filter:", filter);
@@ -165,6 +173,8 @@ export const getSportFromDB = async ({
     const results = await DropIn.find(filter)
         .populate("LocationRef", "LocationName District StreetName StreetType")
         .sort({ BeginDate: 1 });
+
+    console.log(results)
     return results;
 };
 // q is a string rn.
