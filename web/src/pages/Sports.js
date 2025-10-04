@@ -29,7 +29,7 @@ const Sports = () => {
     if (filters.location) params.append("location", filters.location);
 
     // final URL (use sport as the path param)
-    const url = `/times/${filters.sport}?${params.toString()}`
+    const url = `https://volleyballtoronto.onrender.com/times/${filters.sport}?${params.toString()}`
     console.log("URL", url)
     fetch(url)
       .then((res) => res.json())

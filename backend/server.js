@@ -1,7 +1,6 @@
 import express from "express";
 import {
   connectDB,
-  updateFromToronto,
   getSportFromDB,
   getLocations
 } from "./db.js";
@@ -9,14 +8,6 @@ import {
 const app = express();
 const PORT = process.env.PORT || 4000;
 const { dropResult } = await connectDB();
-
-// Function to update database
-const updateDB = async () => {
-  const updateFromTorontoResponse = await updateFromToronto();
-  console.log(updateFromTorontoResponse)
-}
-
-updateDB()
 
 app.get("/", (req, res) => {
   res.send("<h1>Welcome, Express + MongoDB is working! </h1>");
