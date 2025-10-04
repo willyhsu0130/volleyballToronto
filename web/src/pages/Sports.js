@@ -73,9 +73,14 @@ const SearchBar = ({
       // The value from <input type="date"> is local YYYY-MM-DD
       const localDate = new Date(value);
 
-      // Convert local -> UTC ISO string (so DB is consistent)
+      // force interpret it as Toronto time
+      const torontoTime = new Date(
+        localDate.toLocaleString("en-US", { timeZone: "America/Toronto" })
+      );
+
+      // convert that to UTC ISO string
       const utcDate = new Date(
-        localDate.getTime() - localDate.getTimezoneOffset() * 60000
+        torontoTime.getTime() - torontoTime.getTimezoneOffset() * 60000
       ).toISOString();
 
       setFilter((prev) => ({
@@ -166,19 +171,19 @@ const ResultCard = ({ item }) => {
 
 
   const formattedDateTime = begin.toLocaleString("en-CA", {
-  timeZone: "America/Toronto",
-  weekday: "short",
-  month: "short",
-  day: "numeric",
-  hour: "numeric",
-  minute: "2-digit"
-});
+    timeZone: "America/Toronto",
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit"
+  });
 
-const formattedEndTime = end.toLocaleTimeString("en-CA", {
-  timeZone: "America/Toronto",
-  hour: "numeric",
-  minute: "2-digit"
-});
+  const formattedEndTime = end.toLocaleTimeString("en-CA", {
+    timeZone: "America/Toronto",
+    hour: "numeric",
+    minute: "2-digit"
+  });
 
   return (
     <div className="bg-white p-4 rounded shadow hover:shadow-md transition">
@@ -193,7 +198,7 @@ const formattedEndTime = end.toLocaleTimeString("en-CA", {
       <span className="text-sm text-gray-500">
         {item.AgeMax === "None"
           ? `${item.AgeMin}+`
-          : `${item.AgeMin}–${item.AgeMax}`}
+          : `${item.AgeMin}-${item.AgeMax}`}
       </span>
     </div>
   );
