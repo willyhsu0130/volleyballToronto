@@ -165,35 +165,30 @@ const ResultCard = ({ item }) => {
   const end = new Date(item.EndDate);
 
 
-  const formattedDate = begin.toLocaleDateString("en-US", {
-    timeZone: "America/Toronto",
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+  const formattedDateTime = begin.toLocaleString("en-CA", {
+  timeZone: "America/Toronto",
+  weekday: "short",
+  month: "short",
+  day: "numeric",
+  hour: "numeric",
+  minute: "2-digit"
+});
 
-  console.log(formattedDate)
-
-  const formattedTime = `${begin.toLocaleTimeString("en-US", {
-    timeZone: "America/Toronto", 
-    hour: "numeric",
-    minute: "2-digit"
-  })} – ${end.toLocaleTimeString("en-US", {
-    timeZone: "America/Toronto", 
-    hour: "numeric",
-    minute: "2-digit"
-  })}`;
+const formattedEndTime = end.toLocaleTimeString("en-CA", {
+  timeZone: "America/Toronto",
+  hour: "numeric",
+  minute: "2-digit"
+});
 
   return (
     <div className="bg-white p-4 rounded shadow hover:shadow-md transition">
       <h3 className="font-bold text-lg">{item.CourseTitle}</h3>
       <p className="text-gray-700">{item.LocationName}</p>
       <span className="text-sm text-gray-500 mr-4">
-        {formattedTime}
+        {formattedDateTime}
       </span>
       <span className="text-sm text-gray-500 mr-4">
-        {formattedDate}
+        {formattedEndTime}
       </span>
       <span className="text-sm text-gray-500">
         {item.AgeMax === "None"
