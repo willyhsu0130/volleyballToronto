@@ -4,7 +4,7 @@
 import mongoose from "mongoose";
 import { getTorontoData } from "./services/torontoData.js";
 import { configDotenv } from "dotenv";
-import { Location } from "./models/location.js";
+import { Location } from "./models/Location.js";
 import { DropIn } from "./models/DropIns.js";
 
 configDotenv()
