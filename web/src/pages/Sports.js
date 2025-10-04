@@ -158,12 +158,15 @@ const SearchBar = ({
 
 const ResultCard = ({ item }) => {
 
+  // Begin is in UTC
   const begin = new Date(item.BeginDate);
+
+  // End is in UTC
   const end = new Date(item.EndDate);
 
 
   const formattedDate = begin.toLocaleDateString("en-US", {
-    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    timeZone: "America/Toronto",
     weekday: "short",
     month: "short",
     day: "numeric",
