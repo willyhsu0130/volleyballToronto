@@ -65,7 +65,16 @@ const SearchBar = ({
   setFilter
 }) => {
 
-  const handleOnChange = (e) => {
+  const handleAgeChange = (e) =>{
+    const {value} = e.target
+    setFilter((prev) => ({
+      ...prev,
+      age: value
+    }))
+  }
+
+
+  const handleDateChange = (e) => {
     const { name, value } = e.target;
 
     // If it's a date input, convert it into UTC before saving
@@ -103,7 +112,7 @@ const SearchBar = ({
           name="query"
           placeholder="Search for sport, age, location, or community center..."
           className="w-full px-3 py-2 border border-black rounded"
-          onChange={handleOnChange}
+          onChange=""
         />
       </div>
 
@@ -117,7 +126,7 @@ const SearchBar = ({
             type="number"
             min="6"
             className=" px-2 py-2 border rounded"
-            onChange={handleOnChange}
+            onChange={handleAgeChange}
           />
         </div>
 
@@ -126,7 +135,7 @@ const SearchBar = ({
         <select
           className="flex-1 px-2 py-2 border rounded "
           name="time"
-          onChange={handleOnChange}>
+          onChange="">
           <option value="">Time</option>
           <option value="morning">Morning (6am–12pm)</option>
           <option value="afternoon">Afternoon (12pm–5pm)</option>
@@ -138,14 +147,14 @@ const SearchBar = ({
           name="beginDate"
           type="date"
           className="flex-1 px-2 py-2 border rounded"
-          onChange={handleOnChange}
+          onChange={handleDateChange}
         />
 
         <input
           name="endDate"
           type="date"
           className="flex-1 px-2 py-2 border rounded"
-          onChange={handleOnChange}
+          onChange={handleDateChange}
         />
 
         {/* Location filter */}
@@ -190,10 +199,7 @@ const ResultCard = ({ item }) => {
       <h3 className="font-bold text-lg">{item.CourseTitle}</h3>
       <p className="text-gray-700">{item.LocationName}</p>
       <span className="text-sm text-gray-500 mr-4">
-        {formattedDateTime}
-      </span>
-      <span className="text-sm text-gray-500 mr-4">
-        {formattedEndTime}
+        {formattedDateTime} - {formattedEndTime}
       </span>
       <span className="text-sm text-gray-500">
         {item.AgeMax === "None"
