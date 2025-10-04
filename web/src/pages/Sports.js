@@ -166,7 +166,7 @@ const ResultCard = ({ item }) => {
 
 
   const formattedDate = begin.toLocaleDateString("en-US", {
-    timeZone: "America/Toronto",
+    timeZone: "America/Toronto", // ✅ always force Toronto
     weekday: "short",
     month: "short",
     day: "numeric",
@@ -174,12 +174,14 @@ const ResultCard = ({ item }) => {
   });
 
   const formattedTime = `${begin.toLocaleTimeString("en-US", {
+    timeZone: "America/Toronto", // ✅ must include this too
     hour: "numeric",
     minute: "2-digit"
   })} – ${end.toLocaleTimeString("en-US", {
+    timeZone: "America/Toronto", // ✅ must include this too
     hour: "numeric",
     minute: "2-digit"
-  })}`
+  })}`;
 
   return (
     <div className="bg-white p-4 rounded shadow hover:shadow-md transition">
