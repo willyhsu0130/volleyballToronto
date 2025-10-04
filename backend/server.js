@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import {
   connectDB,
   getSportFromDB,
@@ -8,6 +9,8 @@ import {
 const app = express();
 const PORT = process.env.PORT || 4000;
 const { dropResult } = await connectDB();
+
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.send("<h1>Welcome, Express + MongoDB is working! </h1>");
