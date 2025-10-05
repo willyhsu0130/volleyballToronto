@@ -2,8 +2,15 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Sports from "./pages/Sports.js";
 import Locations from "./pages/Locations.js";
 import CommunityCenter from "./pages/CommunityCenter.js";
+const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API
 
 export default function App() {
+  // Warm up server
+
+  const response = fetch(REACT_APP_SERVER_API)
+  console.log(response)
+
+
   return (
     <div className="h-screen bg-white flex flex-col">
       <Router>

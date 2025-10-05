@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { useParams } from "react-router-dom"
 import { ResultCards } from "../components/ResultCards"
 import { Calendar } from "../components/Calendar"
-import { GoogleMaps } from "../components/GoogleMaps"
+import { GoogleMaps, GoogleMapsEmbed } from "../components/GoogleMaps"
 
 const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API
 
@@ -34,6 +34,12 @@ const CommunityCenter = () => {
 
                 const data = await res.json()
                 setCommunityCenterData(data)
+                // Format my address
+                setAddress(
+                    `${data.StreetNo} ${data.StreetName} ${data.StreetType}, ${data.PostalCode}, ${data.District}`
+                );
+
+
                 console.log("Data fetched:", data)
             } catch (err) {
                 console.error(err)
@@ -68,24 +74,11 @@ const CommunityCenter = () => {
         fetchDropIns()
     }, [communityCenterId, filters])
 
-    // Set Address
-    useEffect(() => {
-        if (!communityCenterData || communityCenterData.error){
-            console.log("Cannot get center data")
-            return;
-        } 
-        setAddress(
-            `${communityCenterData.StreetNo ?? ""} ${communityCenterData.StreetName ?? ""} ${communityCenterData.StreetType ?? ""}, ${communityCenterData.PostalCode ?? ""}, ${communityCenterData.District ?? ""}`.trim()
-        );
-    }, [communityCenterData]);
-    
-    if (loading) return <p>Loading drop-ins...</p>;
     if (!communityCenterData) return <p>Loading community center...</p>
     if (communityCenterData.error) return <p>{communityCenterData.error}</p>
 
-    console.log(dropIns)
     return (
-        <div className="flex flex-col h-full overflow-y-auto">
+        <div className="flex flex-col min-h-screen overflow-y-auto">
             <div className="h-[15%] p-5 bg-gray-300 ">
                 <h1 className="text-[35px] font-bold">{communityCenterData.LocationName}</h1>
                 <p className="text-gray-700 leading-relaxed">
@@ -97,10 +90,9 @@ const CommunityCenter = () => {
                     {communityCenterData.District}
                 </p>
             </div>
-            <div className="flex-1">
-                <GoogleMaps />
-            </div>
-            <div className="flex-1 bg-black flex">
+            {communityCenterData &&
+                <GoogleMapsEmbed address={communityCenterData.LocationName} className="h-[60vh]" />}
+            <div className=" bg-black flex flex-1">
                 <ResultCards className="w-[40%] h-full p-3 overflow-y-auto flex flex-col gap-y-3"
                     list={dropIns}
                     linkToLocation={false}
@@ -110,5 +102,8 @@ const CommunityCenter = () => {
         </div>
     )
 }
+
+
+
 
 export default CommunityCenter

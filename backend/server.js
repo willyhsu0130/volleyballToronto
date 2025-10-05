@@ -14,7 +14,7 @@ const { dropResult } = await connectDB();
 app.use(cors());
 
 app.get("/", (req, res) => {
-  res.send("<h1>Welcome, Express + MongoDB is working! </h1>");
+  console.log("warming up")
 });
 
 app.listen(PORT, () => {
