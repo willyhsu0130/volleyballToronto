@@ -1,0 +1,112 @@
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { ResultCards } from "../components/ResultCards";
+import { CalendarSchedule } from "../components/CalendarSchedule";
+
+const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API;
+
+const DropIns = () => {
+  const [searchParams] = useSearchParams();
+  const sportFromUrl = searchParams.get("sport") || "";
+  const [dropIns, setDropIns] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const [filters, setFilter] = useState({
+    sport: sportFromUrl,
+    age: "",
+    beginDate: "",
+    endDate: "",
+    location: "",
+  });
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (filters.beginDate) params.append("beginDate", filters.beginDate);
+    if (filters.endDate) params.append("endDate", filters.endDate);
+    if (filters.age) params.append("age", filters.age);
+    if (filters.location) params.append("location", filters.location);
+
+    const url = `${REACT_APP_SERVER_API}times/${filters.sport}?${params.toString()}`;
+
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        setDropIns(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching drop-ins:", err);
+        setLoading(false);
+      });
+  }, [filters]);
+
+  if (loading) return <p>Loading drop-ins...</p>;
+
+  return (
+    <div className="h-full flex flex-col bg-black">
+      <SearchBar className="bg-white h-[10%] flex items-center gap-4 px-5" setFilter={setFilter} filters={filters} />
+      <div className="h-[90%] w-screen flex">
+        <ResultCards className="w-[40%] h-full p-3 overflow-y-auto flex flex-col gap-y-3" list={dropIns} linkToLocation />
+        <CalendarSchedule className="w-[60%] flex flex-col bg-white p-5 items-center justify-center font-bold" />
+      </div>
+    </div>
+  );
+};
+
+const SearchBar = ({ className, setFilter, filters }) => {
+  const handleDateChange = (e) => {
+    const { name, value } = e.target;
+    const utcDate = new Date(`${value}T00:00:00-04:00`).toISOString();
+
+    setFilter((prev) => ({
+      ...prev,
+      [name]: utcDate,
+    }));
+  };
+
+  const handleAddFilter = (e) =>{
+      const {name, value} = e.target
+    }
+
+  return (
+    <div className={`${className}`}>
+      <div className="w-[40%] flex gap-x-2">
+        <input
+          name="sport"
+          value={filters.sport}
+          onChange={(e) => setFilter((prev) => ({ ...prev, sport: e.target.value }))}
+          placeholder="Search for a sport..."
+          className="w-[80%] px-3 py-2 border border-black rounded"
+        />
+        <button
+          className="w-[20%] px-3 py-2 border border-black rounded"
+          onClick={() =>{}}
+        >Save Filter</button>
+      </div>
+
+      <div className="w-[60%] flex gap-3">
+        <input
+          name="age"
+          placeholder="Age"
+          type="number"
+          min="6"
+          className="flex-1 px-2 py-2 border rounded"
+          onChange={(e) => setFilter((prev) => ({ ...prev, age: e.target.value }))}
+        />
+
+        <input name="beginDate" type="date" className="flex-1 px-2 py-2 border rounded" onChange={handleDateChange} />
+        <input name="endDate" type="date" className="flex-1 px-2 py-2 border rounded" onChange={handleDateChange} />
+
+        <select
+          name="location"
+          className="flex-1 px-2 py-2 border rounded"
+          onChange={(e) => setFilter((prev) => ({ ...prev, location: e.target.value }))}
+        >
+          <option value="">Location</option>
+        </select>
+      </div>
+    </div>
+  );
+};
+
+export default DropIns;

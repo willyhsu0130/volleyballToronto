@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react"
 import { useParams } from "react-router-dom"
 import { ResultCards } from "../components/ResultCards"
-import { Calendar } from "../components/Calendar"
-import { GoogleMaps, GoogleMapsEmbed } from "../components/GoogleMaps"
+import { CalendarSchedule } from "../components/CalendarSchedule"
+import { GoogleMapsEmbed } from "../components/GoogleMaps"
 
 const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API
 
@@ -11,7 +11,6 @@ const CommunityCenter = () => {
     const [loading, setLoading] = useState(true);
     const [communityCenterData, setCommunityCenterData] = useState(null)
     const [dropIns, setDropIns] = useState([])
-    const [address, setAddress] = useState()
 
     const [filters, setFilter] = useState({
         sport: "Volleyball",
@@ -34,11 +33,6 @@ const CommunityCenter = () => {
 
                 const data = await res.json()
                 setCommunityCenterData(data)
-                // Format my address
-                setAddress(
-                    `${data.StreetNo} ${data.StreetName} ${data.StreetType}, ${data.PostalCode}, ${data.District}`
-                );
-
 
                 console.log("Data fetched:", data)
             } catch (err) {
@@ -97,7 +91,7 @@ const CommunityCenter = () => {
                     list={dropIns}
                     linkToLocation={false}
                 />
-                <Calendar className="w-[60%] flex flex-col bg-white p-5 items-center justify-center font-bold" />
+                <CalendarSchedule className="w-[60%] flex flex-col bg-white p-5 items-center justify-center font-bold" />
             </div>
         </div>
     )
