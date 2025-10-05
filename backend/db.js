@@ -134,7 +134,7 @@ export const getSportFromDB = async ({
     sport,
     beginDate,
     endDate,
-    location,
+    locationId,
     age
 }) => {
     const filter = {};
@@ -142,8 +142,8 @@ export const getSportFromDB = async ({
     if (sport) filter.CourseTitle = sport;
 
     // Location filter (by name, case-insensitive)
-    if (location) {
-        filter.LocationName = new RegExp(location, "i");
+    if (locationId) {
+        filter.LocationId = locationId
     }
 
     // Date filter
@@ -174,7 +174,7 @@ export const getSportFromDB = async ({
         .populate("LocationRef", "LocationName District StreetName StreetType")
         .sort({ BeginDate: 1 });
 
-    console.log(results)
+    // console.log(results)
     return results;
 };
 // q is a string rn.
@@ -199,6 +199,15 @@ export const getLocations = async ({ q, nameOnly }) => {
     return results;
 };
 
+
+export const getLocation = async ({ locationId }) => {
+    // Build filter object
+    
+    let results = Location.findOne(
+        {LocationId: locationId}
+    );
+    return results;
+};
 
 const dateDataMerge = ({ date, hour, minute }) => {
     if (!date) {

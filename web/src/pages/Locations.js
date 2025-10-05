@@ -26,11 +26,21 @@ const useLocationSearch = (query) => {
 };
 
 const Locations = () => {
-  const [query, setQuery] = useState("");
-  const { results, loading } = useLocationSearch(query);
+  
 
   return (
     <div className="flex flex-col items-center w-full p-6">
+      <LocationQuery/>
+    </div>
+  );
+};
+
+
+const LocationQuery = () => {
+  const [query, setQuery] = useState("");
+  const { results, loading } = useLocationSearch(query);
+  return (
+    <div>
       {/* Search bar */}
       <div className="w-full max-w-lg">
         <input
@@ -66,7 +76,7 @@ const Locations = () => {
         <p className="mt-6 text-gray-500">No community centers found.</p>
       )}
     </div>
-  );
-};
+  )
+}
 
 export default Locations;

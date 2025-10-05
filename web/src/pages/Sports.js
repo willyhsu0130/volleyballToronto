@@ -1,4 +1,6 @@
 import { useState, useEffect, } from "react"
+import { ResultCards } from "../components/ResultCards"
+import { Calendar } from "../components/Calendar"
 
 const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API
 
@@ -55,6 +57,7 @@ const Sports = () => {
 
         <ResultCards className="w-[40%] h-full p-3 overflow-y-auto flex flex-col gap-y-3"
           list={dropIns}
+          linkToLocation={true}
         />
         <Calendar className="w-[60%] flex flex-col bg-white p-5 items-center justify-center font-bold" />
       </div>
@@ -153,75 +156,4 @@ const SearchBar = ({
   );
 };
 
-
-const ResultCard = ({ item }) => {
-
-  // Begin is in UTC
-  const begin = new Date(item.BeginDate);
-
-  // End is in UTC
-  const end = new Date(item.EndDate);
-
-
-  const formattedDateTime = begin.toLocaleString("en-CA", {
-    timeZone: "America/Toronto",
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit"
-  });
-
-  const formattedEndTime = end.toLocaleTimeString("en-CA", {
-    timeZone: "America/Toronto",
-    hour: "numeric",
-    minute: "2-digit"
-  });
-
-  return (
-    <div className="bg-white p-4 rounded shadow hover:shadow-md transition">
-      <h3 className="font-bold text-lg">{item.CourseTitle}</h3>
-      <p className="text-gray-700">{item.LocationName}</p>
-      <span className="text-sm text-gray-500 mr-4">
-        {formattedDateTime} - {formattedEndTime}
-      </span>
-      <span className="text-sm text-gray-500">
-        {item.AgeMax == null || item.AgeMax === 0
-          ? `${item.AgeMin}+`
-          : `${item.AgeMin}–${item.AgeMax}`}
-      </span>
-    </div>
-  );
-}
-
-
-const ResultCards = ({ className, list }) => {
-  return (
-    <>
-      {list.length === 0 ? (
-        <div className={`${className} flex flex-col items-center justify-center`}>
-          <p className="text-white font-bold">No programs found</p>
-        </div>
-
-      ) : (
-        <div className={`${className}`}>
-          <p className="text-white">Search Results ( {list.length} )</p>
-          {list?.map((item) => (
-            <ResultCard item={item} />
-          ))}
-        </div>
-      )}
-    </>
-  )
-}
-
-
-const Calendar = ({ className }) => {
-
-  return (
-    <div className={`${className}`}>
-      <h3>Calendar</h3>
-    </div>
-  )
-}
 export default Sports;

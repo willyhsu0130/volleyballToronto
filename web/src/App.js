@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Sports from "./pages/Sports.js";
 import Locations from "./pages/Locations.js";
+import CommunityCenter from "./pages/CommunityCenter.js";
 
 export default function App() {
   return (
@@ -38,6 +39,7 @@ export default function App() {
             />
             <Route path="/sports" element={<Sports />} />
             <Route path="/locations" element={<Locations />} />
+            <Route path="/locations/:communityCenterId" element={<CommunityCenter />} />
           </Routes>
         </div>
       </Router>

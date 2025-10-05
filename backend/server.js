@@ -3,7 +3,8 @@ import cors from "cors";
 import {
   connectDB,
   getSportFromDB,
-  getLocations
+  getLocations,
+  getLocation
 } from "./db.js";
 
 const app = express();
@@ -23,7 +24,7 @@ app.listen(PORT, () => {
 app.get("/times/:sport", async (req, res) => {
   try {
     const sport = req.params.sport?.trim();
-    const { beginDate, endDate, location, age } = req.query;
+    const { beginDate, endDate, locationId, age } = req.query;
 
     // -------- Validation & Sanitization --------
     if (!sport || typeof sport !== "string") {
@@ -57,12 +58,13 @@ app.get("/times/:sport", async (req, res) => {
     }
 
     let safeLocation = null;
-    if (location) {
-      if (typeof location !== "string") {
-        return res.status(400).json({ error: "Invalid location" });
+    if (locationId) {
+      const parsedLocationId = Number(locationId)
+      if (isNaN(parsedLocationId)) {
+        return res.status(400).json({ error: "Age must be a number" });
       }
       // trim & escape regex special chars to avoid ReDoS injection
-      safeLocation = location.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      safeLocation = locationId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     }
 
     // -------- Query DB --------
@@ -70,7 +72,7 @@ app.get("/times/:sport", async (req, res) => {
       sport,
       beginDate: parsedBeginDate,
       endDate: parsedEndDate,
-      location: safeLocation,
+      locationId: safeLocation,
       age: age
     });
 
@@ -93,3 +95,25 @@ app.get("/locations", async (req, res) => {
   )
   res.json(results)
 })
+
+app.get("/locations/:communityCenterId", async (req, res) => {
+  console.log("Received request for community center");
+
+  try {
+    const locationId = req.params.communityCenterId?.trim();
+
+    // Find a single location by LocationId
+    const result = await getLocation({
+      locationId: locationId
+    });
+
+    if (!result) {
+      return res.status(404).json({ error: "Community center not found" });
+    }
+
+    res.json(result);
+  } catch (error) {
+    console.error("Error fetching community center:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
