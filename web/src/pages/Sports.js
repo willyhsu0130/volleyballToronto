@@ -81,29 +81,23 @@ const SearchBar = ({
     // If it's a date input, convert it into UTC before saving
     if (name === "beginDate" || name === "endDate") {
       // The value from <input type="date"> is local YYYY-MM-DD
-      const localDate = new Date(value);
+      const torontoDate = new Date(`${value}T00:00:00-04:00`);
+      // Note: -04:00 is Toronto offset for EDT (use -05:00 for winter months)
 
-      // force interpret it as Toronto time
-      const torontoTime = new Date(
-        localDate.toLocaleString("en-US", { timeZone: "America/Toronto" })
-      );
-
-      // convert that to UTC ISO string
-      const utcDate = new Date(
-        torontoTime.getTime() - torontoTime.getTimezoneOffset() * 60000
-      ).toISOString();
+      const utcDate = torontoDate.toISOString(); // Convert to UTC ISO
+      console.log("Toronto local midnight as UTC:", utcDate);
 
       setFilter((prev) => ({
         ...prev,
         [name]: utcDate
       }));
-    } else {
+    } else
       // Everything else (age, time, location, query, etc.)
       setFilter((prev) => ({
         ...prev,
         [name]: value
       }));
-    }
+
   };
   return (
     <div className={`${className}`}>
