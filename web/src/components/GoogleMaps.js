@@ -73,7 +73,6 @@ export const GoogleMapsEmbed = ({ address, className }) => {
         src={mapUrl}
         width="100%"
         height="100%"
-        style={{ border: 0, borderRadius: "10px" }}
         allowFullScreen
         loading="lazy"
         referrerPolicy="no-referrer-when-downgrade"
