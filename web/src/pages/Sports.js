@@ -11,7 +11,6 @@ const Sports = () => {
     query: "",
     sport: "Volleyball",
     age: "",
-    time: "",
     beginDate: "",
     endDate: "",
     location: "",
@@ -29,7 +28,6 @@ const Sports = () => {
     if (filters.beginDate) params.append("beginDate", filters.beginDate);
     if (filters.beginDate) params.append("endDate", filters.endDate);
     if (filters.age) params.append("age", filters.age);
-    if (filters.time) params.append("time", filters.time);
     if (filters.location) params.append("location", filters.location);
 
     // final URL (use sport as the path param)
@@ -134,17 +132,6 @@ const SearchBar = ({
         </div>
 
 
-        {/* Time filter */}
-        <select
-          className="flex-1 px-2 py-2 border rounded "
-          name="time"
-          onChange={() => { }}>
-          <option value="">Time</option>
-          <option value="morning">Morning (6am–12pm)</option>
-          <option value="afternoon">Afternoon (12pm–5pm)</option>
-          <option value="evening">Evening (5pm–10pm)</option>
-        </select>
-
         {/* Date Begin filter */}
         <input
           name="beginDate"
@@ -224,6 +211,7 @@ const ResultCards = ({ className, list }) => {
 
       ) : (
         <div className={`${className}`}>
+          <p className="text-white">Search Results ( {list.length} )</p>
           {list?.map((item) => (
             <ResultCard item={item} />
           ))}
