@@ -1,0 +1,2 @@
+// Make date automaticlaly today upon arrival
+// Add logos for common sports under query to select using lucide react
