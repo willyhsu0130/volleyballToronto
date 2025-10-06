@@ -131,7 +131,7 @@ export const updateFromToronto = async () => {
 
 
 export const getSportFromDB = async ({
-    sport,
+    sports,
     beginDate,
     endDate,
     locationId,
@@ -139,7 +139,13 @@ export const getSportFromDB = async ({
 }) => {
     const filter = {};
 
-    if (sport) filter.CourseTitle = sport;
+    if (sports) {
+        if (Array.isArray(sports)) {
+            filter.CourseTitle = { $in: sports }; // match any sport in the list
+        } else {
+            filter.CourseTitle = sports; // single sport
+        }
+    }
 
     // Location filter (by name, case-insensitive)
     if (locationId) {
@@ -202,9 +208,9 @@ export const getLocations = async ({ q, nameOnly }) => {
 
 export const getLocation = async ({ locationId }) => {
     // Build filter object
-    
+
     let results = Location.findOne(
-        {LocationId: locationId}
+        { LocationId: locationId }
     );
     return results;
 };

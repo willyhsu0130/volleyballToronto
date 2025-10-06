@@ -1,18 +1,20 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ResultCards } from "../components/ResultCards";
-import { CalendarSchedule } from "../components/CalendarSchedule";
+import { CalendarSchedule } from "../components/CalendarSchedule.js";
+import { FilterChips } from "../components/FilterChips.js"
 
 const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API;
 
 const DropIns = () => {
   const [searchParams] = useSearchParams();
-  const sportFromUrl = searchParams.get("sport") || "";
+  const sportsFromUrl = searchParams.get("sports") || "";
   const [dropIns, setDropIns] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState("")
 
   const [filters, setFilter] = useState({
-    sport: sportFromUrl,
+    sports: sportsFromUrl,
     age: "",
     beginDate: "",
     endDate: "",
@@ -26,9 +28,10 @@ const DropIns = () => {
     if (filters.age) params.append("age", filters.age);
     if (filters.location) params.append("location", filters.location);
 
-    const url = `${REACT_APP_SERVER_API}times/${filters.sport}?${params.toString()}`;
-
-    fetch(url)
+    const sportPath = (filters.sports || []).join(",")
+    const url = `${REACT_APP_SERVER_API}times/${sportPath}?${params.toString()}`;
+    console.log(url)
+    const fetchResponse = fetch(url)
       .then((res) => res.json())
       .then((data) => {
         setDropIns(data);
@@ -38,6 +41,8 @@ const DropIns = () => {
         console.error("Error fetching drop-ins:", err);
         setLoading(false);
       });
+
+    console.log(fetchResponse)
   }, [filters]);
 
   if (loading) return <p>Loading drop-ins...</p>;
@@ -54,6 +59,13 @@ const DropIns = () => {
 };
 
 const SearchBar = ({ className, setFilter, filters }) => {
+
+  const [searchInput, setSearchInput] = useState(filters.sports)
+
+  const handleSearchInputChange = (e) => {
+    setSearchInput(e.target.value)
+  }
+
   const handleDateChange = (e) => {
     const { name, value } = e.target;
     const utcDate = new Date(`${value}T00:00:00-04:00`).toISOString();
@@ -64,24 +76,58 @@ const SearchBar = ({ className, setFilter, filters }) => {
     }));
   };
 
-  const handleAddFilter = (e) =>{
-      const {name, value} = e.target
-    }
+  const handleAddFilter = (e) => {
+    e.preventDefault();
+
+    const newSport = searchInput.trim();
+    if (!newSport) return; // ignore empty input
+
+    setFilter((prev) => {
+      const currentSports = prev.sports || [];
+      // prevent duplicates (case-insensitive)
+      if (currentSports.some(s => s.toLowerCase() === newSport.toLowerCase())) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        sports: [...currentSports, newSport],
+      };
+    });
+
+    setSearchInput("");
+  }
+
+  const handleRemoveFilter = (sportToRemove) => {
+    setFilter((prev) => ({
+      ...prev,
+      sports: prev.sports.filter((s) => s !== sportToRemove),
+    }));
+  };
 
   return (
     <div className={`${className}`}>
       <div className="w-[40%] flex gap-x-2">
-        <input
-          name="sport"
-          value={filters.sport}
-          onChange={(e) => setFilter((prev) => ({ ...prev, sport: e.target.value }))}
-          placeholder="Search for a sport..."
-          className="w-[80%] px-3 py-2 border border-black rounded"
-        />
+        <div className="w-[80%] px-3 py-2 border border-black rounded flex gap-x-1">
+          <FilterChips
+            className="max-w-[30%] h-full flex flex-wrap gap-2"
+            filters={filters}
+            searchInput={searchInput}
+            handleRemoveFilter={handleRemoveFilter} />
+
+          <input
+            name="sports"
+            value={searchInput}
+            onChange={handleSearchInputChange}
+            placeholder="Search for a sport or sports..."
+            className="flex-1 h-full"
+          />
+        </div>
+
         <button
           className="w-[20%] px-3 py-2 border border-black rounded"
-          onClick={() =>{}}
-        >Save Filter</button>
+          onClick={handleAddFilter}
+        >Add Filter</button>
       </div>
 
       <div className="w-[60%] flex gap-3">

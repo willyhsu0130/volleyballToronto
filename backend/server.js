@@ -15,21 +15,37 @@ app.use(cors());
 
 app.get("/", (req, res) => {
   console.log("warming up")
+  return res.status(200).json([])
 });
 
 app.listen(PORT, () => {
   console.log(`Server running at https://localhost:${PORT}`);
 });
 
-app.get("/times/:sport", async (req, res) => {
+app.get("/times", async (req, res) =>{
+  return res.status(200).json([])
+})
+
+
+app.get("/times/:sports", async (req, res) => {
   try {
-    const sport = req.params.sport?.trim();
+    // Turn to array
+    const sports = req.params.sports
+    
+    if (!sports || typeof sports !== "string") {
+      return res.status(400).json({ error: "Invalid sports parameter" });
+    }
+
+    const sportsArray = sports.split(",")                     // split by comma
+      .map((s) => s.trim())            // remove spaces
+      .filter((s) => s.length > 0);
+
+    console.log(sportsArray)
     const { beginDate, endDate, locationId, age } = req.query;
 
+
     // -------- Validation & Sanitization --------
-    if (!sport || typeof sport !== "string") {
-      return res.status(400).json({ error: "Invalid sport parameter" });
-    }
+
 
     let parsedBeginDate = null;
     let parsedEndDate = null;
@@ -69,7 +85,7 @@ app.get("/times/:sport", async (req, res) => {
 
     // -------- Query DB --------
     const results = await getSportFromDB({
-      sport,
+      sports: sportsArray,
       beginDate: parsedBeginDate,
       endDate: parsedEndDate,
       locationId: safeLocation,
