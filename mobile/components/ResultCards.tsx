@@ -2,7 +2,6 @@ import {
     View,
     Text,
     TouchableOpacity,
-    ScrollView,
     FlatList
 } from "react-native"
 import { Link } from "expo-router";

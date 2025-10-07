@@ -12,7 +12,7 @@ function HomePage() {
 
   const handleSearch = () => {
     if (!query.trim()) return;
-    navigate(`/dropins?sports=${encodeURIComponent(query.trim())}`);
+    navigate(`/dropins?dropIns=${encodeURIComponent(query.trim())}`);
   };
 
   return (
