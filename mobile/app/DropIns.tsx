@@ -67,9 +67,9 @@ const DropIns = () => {
 
 
   return (
-    <View className="gap-y-3">
+    <View className="gap-y-3 p-2">
       <SearchBar
-        className="border border-black rounded-full"
+        className="border border-black rounded-full p-1"
         setFilter={setFilter}
         filters={filters} />
       {ResultCards && <ResultCards

@@ -88,8 +88,7 @@ export const ResultCards = ({
     }
     return (
         <View className={className}>
-            <Text className="text-black">Search Results ({list.length})</Text>
-
+            <Text className="text-black font-bold mb-2">Search Results ({list.length})</Text>
             <FlatList
                 data={list}
                 keyExtractor={(item, index) => index.toString()}
