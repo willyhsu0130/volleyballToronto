@@ -1,16 +1,15 @@
 export const FilterChips = ({ filters, className, handleRemoveFilter}) => {
 
-    if (!filters) return null;
+    if (!filters) return null
 
-    // Convert object to array of [key, value] pairs and filter out empty ones
     const sports = filters.sports
 
-    if (sports.length === 0) return (
-        <div>
+    // Check if it is an array
+    if(sports.length === 1 && !sports[0]){
+        return null
+    }
 
-        </div>
-    );
-
+    console.log(sports)
     return (
         <div className={`${className}`}>
             {sports &&

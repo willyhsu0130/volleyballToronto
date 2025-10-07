@@ -8,12 +8,21 @@ const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API;
 
 const DropIns = () => {
   const [searchParams] = useSearchParams();
-  const sportsFromUrl = searchParams.get("sports") || "";
+
+  // Let sports FromUrl always an array. If it's singular, we use [{value}]
+  let sportsFromUrl
+  if (searchParams?.get("sports")) {
+    sportsFromUrl = [searchParams.get("sports")]
+  }else{
+    sportsFromUrl = ""
+  }
+  console.log(sportsFromUrl)
   const [dropIns, setDropIns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("")
 
   const [filters, setFilter] = useState({
+    // Sports is an array
     sports: sportsFromUrl,
     age: "",
     beginDate: "",
@@ -21,6 +30,7 @@ const DropIns = () => {
     location: "",
   });
 
+  console.log("filters", filters)
   useEffect(() => {
     const params = new URLSearchParams();
     if (filters.beginDate) params.append("beginDate", filters.beginDate);
@@ -28,7 +38,11 @@ const DropIns = () => {
     if (filters.age) params.append("age", filters.age);
     if (filters.location) params.append("location", filters.location);
 
-    const sportPath = (filters.sports || []).join(",")
+    let sportPath
+    if (filters.sports.length === 1) {
+      sportPath = filters.sports[0]
+    }
+
     const url = `${REACT_APP_SERVER_API}times/${sportPath}?${params.toString()}`;
     console.log(url)
     const fetchResponse = fetch(url)
@@ -60,7 +74,7 @@ const DropIns = () => {
 
 const SearchBar = ({ className, setFilter, filters }) => {
 
-  const [searchInput, setSearchInput] = useState(filters.sports)
+  const [searchInput, setSearchInput] = useState()
 
   const handleSearchInputChange = (e) => {
     setSearchInput(e.target.value)

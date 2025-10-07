@@ -9,10 +9,9 @@ const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API;
 function HomePage() {
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
-
   const handleSearch = () => {
     if (!query.trim()) return;
-    navigate(`/dropins?dropIns=${encodeURIComponent(query.trim())}`);
+    navigate(`/dropins?sports=${encodeURIComponent(query.trim())}`);
   };
 
   return (
