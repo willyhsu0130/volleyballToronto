@@ -1,24 +1,37 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
+import { Tabs } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+import { Volleyball, Home } from 'lucide-react-native';
+import React from 'react';
+import '../global.css';
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
 
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );
+    return (
+        <React.Fragment>
+            <StatusBar style="auto" />
+            <Tabs screenOptions={{ tabBarActiveTintColor: "teal" }}>
+                <Tabs.Screen
+                    name="index"
+                    options={{
+                        title: "Home",
+                        tabBarIcon: () => (
+                            <Volleyball />
+                        )
+                    }} />
+                <Tabs.Screen
+                    name="DropIns"
+                    options={{
+                        title: "Drop Ins",
+                        tabBarIcon: () => (
+                            <Home />
+                        )
+                    }}
+
+                />
+                <Tabs.Screen name="Locations" />
+            </Tabs>
+        </React.Fragment>
+    )
 }
+
+

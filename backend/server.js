@@ -14,7 +14,6 @@ const { dropResult } = await connectDB();
 app.use(cors());
 
 app.get("/", (req, res) => {
-  console.log("warming up")
   return res.status(200).json([])
 });
 
