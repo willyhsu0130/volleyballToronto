@@ -19,7 +19,6 @@ interface ResultCardProp {
     linkToLocation: boolean
 }
 
-
 const ResultCard = ({ item, linkToLocation }: ResultCardProp) => {
     if (!item.BeginDate || !item.EndDate) return null;
 

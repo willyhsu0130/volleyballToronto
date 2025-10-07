@@ -28,7 +28,14 @@ export default function RootLayout() {
                     }}
 
                 />
-                <Tabs.Screen name="Locations" />
+                <Tabs.Screen name="Locations"
+                    options={{
+                        href: null, 
+                    }} />
+                <Tabs.Screen name="locations/[communityCenterId]"
+                    options={{
+                        href: null, 
+                    }} />
             </Tabs>
         </React.Fragment>
     )

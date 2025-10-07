@@ -69,7 +69,7 @@ const DropIns = () => {
   return (
     <View className="gap-y-3 p-2">
       <SearchBar
-        className="border border-black rounded-full p-1"
+        className="border border-black text-black font-bold rounded-xl p-2"
         setFilter={setFilter}
         filters={filters} />
       {ResultCards && <ResultCards
@@ -111,7 +111,7 @@ const SearchBar = ({ className, setFilter, filters }: SearchBarProps) => {
       <View>
         <TextInput
           onChangeText={handleSearchInputChange}
-          placeholder="Search for a sport of sports"
+          placeholder="Search for a sport or sports"
         />
 
       </View>
