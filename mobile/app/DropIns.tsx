@@ -1,8 +1,7 @@
 import {
   View,
-  Text
-
-
+  Text,
+  TextInput
 } from "react-native"
 import { useState, useEffect } from "react"
 import { useLocalSearchParams } from "expo-router"
@@ -10,7 +9,7 @@ import Constants from 'expo-constants';
 import { ResultCards } from '../components/ResultCards'
 
 
-const { SERVER_API, ENV } = Constants.expoConfig.extra;
+const SERVER_API = Constants.expoConfig?.extra?.SERVER_API;
 
 const DropIns = () => {
   const searchParams = useLocalSearchParams<{
@@ -41,7 +40,13 @@ const DropIns = () => {
     if (filters.age) params.append("age", filters.age);
     if (filters.location) params.append("location", filters.location);
 
-    const sportPath = (filters.sports || []).join(",")
+    let sportPath = null
+    if (!Array.isArray(filters.sports)) {
+      sportPath = filters.sports
+    }
+    else {
+      sportPath = filters.sports.join(",")
+    }
     const url = `${SERVER_API}times/${sportPath}${params.toString()}`
     console.log(url)
 
@@ -62,8 +67,13 @@ const DropIns = () => {
 
 
   return (
-    <View>
+    <View className="gap-y-3">
+      <SearchBar
+        className="border border-black rounded-full"
+        setFilter={setFilter}
+        filters={filters} />
       {ResultCards && <ResultCards
+        className=""
         list={dropIns}
         linkToLocation={true}
       />}
@@ -71,5 +81,46 @@ const DropIns = () => {
   )
 
 }
+interface SearchBarProps {
+  className: string;
+  filters: {
+    sports: string | string[];
+    age: string;
+    beginDate: string;
+    endDate: string;
+    location: string;
+  };
+  setFilter: React.Dispatch<React.SetStateAction<{
+    sports: string | string[];
+    age: string;
+    beginDate: string;
+    endDate: string;
+    location: string;
+  }>>;
+}
+
+const SearchBar = ({ className, setFilter, filters }: SearchBarProps) => {
+  const [searchInput, setSearchInput] = useState(filters?.sports)
+
+  const handleSearchInputChange = (text: string) => {
+    setSearchInput(text);
+  }
+
+  return (
+    <View className={`${className}`}>
+      <View>
+        <TextInput
+          onChangeText={handleSearchInputChange}
+          placeholder="Search for a sport of sports"
+        />
+
+      </View>
+    </View>
+  )
+
+
+}
+
+
 
 export default DropIns

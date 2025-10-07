@@ -33,7 +33,7 @@
       }
     },
     "extra": {
-      "SERVER_API": "http://10.111.11.23:4000/",
+      "SERVER_API": "https://volleyballtoronto.onrender.com/",
       "ENV": "development"
     }
   }

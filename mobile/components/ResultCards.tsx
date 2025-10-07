@@ -2,10 +2,10 @@ import {
     View,
     Text,
     TouchableOpacity,
-    ScrollView
+    ScrollView,
+    FlatList
 } from "react-native"
 import { Link } from "expo-router";
-import { linkTo } from "expo-router/build/global-state/routing";
 
 interface ResultCardProp {
     item: {
@@ -14,6 +14,8 @@ interface ResultCardProp {
         CourseTitle?: string
         LocationId?: number
         LocationName?: string
+        AgeMin?: number | "None"
+        AgeMax?: number | "None"
     };
     linkToLocation: boolean
 }
@@ -50,6 +52,17 @@ const ResultCard = ({ item, linkToLocation }: ResultCardProp) => {
             ) : (
                 <Text className="text-gray-700">{item.LocationName}</Text>
             )}
+            <View className="flex-row">
+                <Text className="text-sm text-gray-500 mr-4">
+                    {formattedDateTime} - {formattedEndTime}
+                </Text>
+                <Text className="text-sm text-gray-500">
+                    {item.AgeMax == null || item.AgeMax === 0 || item.AgeMax === "None"
+                        ? `${item.AgeMin}+`
+                        : `${item.AgeMin} - ${item.AgeMax}`}
+                </Text>
+            </View>
+
         </TouchableOpacity>
     )
 }
@@ -74,20 +87,19 @@ export const ResultCards = ({
         )
     }
     return (
-        <View>
-            {list &&
-                <ScrollView className={`${className}`}>
-                    <Text className="text-white">Search Results ( {list?.length})</Text>
-                    {
-                        list?.map((item, index) =>(
-                            <ResultCard item={item} key={index} linkToLocation={linkToLocation}/>
-                        ))
-                    }
-                </ScrollView>
-                
-            }
+        <View className={className}>
+            <Text className="text-black">Search Results ({list.length})</Text>
+
+            <FlatList
+                data={list}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => (
+                    <ResultCard item={item} linkToLocation={linkToLocation} />
+                )}
+                showsVerticalScrollIndicator={false}
+            />
         </View>
-    )
+    );
 }
 
 export default ResultCards
