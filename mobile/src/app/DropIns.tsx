@@ -3,10 +3,13 @@ import {
   Text,
   TextInput
 } from "react-native"
+
 import { useState, useEffect } from "react"
 import { useLocalSearchParams } from "expo-router"
-import Constants from 'expo-constants';
 import { ResultCards } from '../components/ResultCards'
+import Constants from 'expo-constants';
+
+import { useFilters } from "@/context/FilterContext";
 
 
 const SERVER_API = Constants.expoConfig?.extra?.SERVER_API;
@@ -17,28 +20,36 @@ const DropIns = () => {
     age?: string;
     beginDate?: string;
     endDate?: string;
-    location?: string;
   }>();
 
+  // sportFromUrl is a string
   const sportsFromUrl = searchParams.sports
   const [dropIns, setDropIns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("")
 
-  const [filters, setFilter] = useState({
-    sports: sportsFromUrl || ["Volleyball"],
-    age: "",
-    beginDate: "",
-    endDate: "",
-    location: "",
-  });
 
+  const { filters, setFilters, } = useFilters()
+
+
+  // Need to update filters.sports immediately./
   useEffect(() => {
+
+    if (sportsFromUrl) {
+      setFilters((prev) => {
+        if (prev.sports === sportsFromUrl) return prev
+        return {
+          ...prev,
+          sports: sportsFromUrl || ""
+        }
+      })
+    }
+
     const params = new URLSearchParams()
     if (filters.beginDate) params.append("beginDate", filters.beginDate);
     if (filters.endDate) params.append("endDate", filters.endDate);
     if (filters.age) params.append("age", filters.age);
-    if (filters.location) params.append("location", filters.location);
+    // if (filters.location) params.append("location", filters.location);
 
     let sportPath = null
     if (!Array.isArray(filters.sports)) {
@@ -62,16 +73,21 @@ const DropIns = () => {
         setLoading(false)
       })
     console.log(fetchResponse)
-  }, [filters])
+  }, [
+    setFilters,
+    sportsFromUrl,
+    filters.age,
+    filters.beginDate,
+    filters.endDate,
+    filters.sports
+  ])
   if (loading) return <Text>Loading Drop Ins...</Text>
 
 
   return (
     <View className="gap-y-3 p-2">
       <SearchBar
-        className="border border-black text-black font-bold rounded-xl p-2"
-        setFilter={setFilter}
-        filters={filters} />
+        className="border border-black text-black font-bold rounded-xl p-2" />
       {ResultCards && <ResultCards
         className=""
         list={dropIns}
@@ -83,23 +99,11 @@ const DropIns = () => {
 }
 interface SearchBarProps {
   className: string;
-  filters: {
-    sports: string | string[];
-    age: string;
-    beginDate: string;
-    endDate: string;
-    location: string;
-  };
-  setFilter: React.Dispatch<React.SetStateAction<{
-    sports: string | string[];
-    age: string;
-    beginDate: string;
-    endDate: string;
-    location: string;
-  }>>;
 }
 
-const SearchBar = ({ className, setFilter, filters }: SearchBarProps) => {
+const SearchBar = ({ className }: SearchBarProps) => {
+
+  const { filters, setFilters, resetFilters } = useFilters()
   const [searchInput, setSearchInput] = useState(filters?.sports)
 
   const handleSearchInputChange = (text: string) => {

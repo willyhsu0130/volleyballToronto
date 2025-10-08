@@ -6,11 +6,34 @@ import Constants from "expo-constants";
 
 const SERVER_API = Constants.expoConfig?.extra?.SERVER_API;
 
+interface CommunityCenterData {
+    LocationId: string
+    ParentLocationId: string
+    LocationName: string
+    LocationType: string
+    Accessibility: string
+    Intersection: string
+    TTCInformation: string
+    District: string
+    StreetNo: string
+    StreetNoSuffix: string
+    StreetName: string
+    StreetType: string
+    StreetDirection: string
+    PostalCode: string
+    Description: string
+    error?: string
+}
+
+
 const CommunityCenter = () => {
-    const { communityCenterId } = useLocalSearchParams()
+    const { communityCenterIdArray } = useLocalSearchParams()
+    const communityCenterId =
+        Array.isArray(communityCenterIdArray) ? communityCenterIdArray[0] : communityCenterIdArray;
+
     console.log(communityCenterId)
     const [loading, setLoading] = useState(true);
-    const [communityCenterData, setCommunityCenterData] = useState(null)
+    const [communityCenterData, setCommunityCenterData] = useState<CommunityCenterData | { error: string }>()
     const [dropIns, setDropIns] = useState([])
 
     const [filters, setFilter] = useState({
@@ -76,7 +99,7 @@ const CommunityCenter = () => {
 
     }, [communityCenterId, filters])
     if (!communityCenterData) return <Text>Loading Community Center...</Text>
-    if (communityCenterData.error) return <Text>{communityCenterData.error}</Text>
+    if ("error" in communityCenterData) return <Text>{communityCenterData.error}</Text>
 
     return (
         <View className="flex flex-col min-h-screen p-2">
