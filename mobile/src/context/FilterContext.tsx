@@ -2,10 +2,11 @@ import React, { createContext, useContext, useState, ReactNode } from "react";
 
 // types in the fiter
 interface FilterState {
-  sports: string | string[];
+  sports: string[];
   age: string;
   beginDate: string;
   endDate: string;
+  locationId: number | undefined;
 }
 
 // types in the filter Context (includes helper funcs and types)
@@ -25,6 +26,7 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
     age: "",
     beginDate: "",
     endDate: "",
+    locationId: undefined
   });
 
   const resetFilters = () => {
@@ -33,6 +35,7 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
       age: "",
       beginDate: "",
       endDate: "",
+      locationId: undefined
     });
   };
 

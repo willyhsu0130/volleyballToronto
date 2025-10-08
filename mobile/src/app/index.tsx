@@ -19,8 +19,7 @@ export default function App() {
 
   useEffect(() => {
     const url = `${SERVER_API}times/`
-    const response = fetch(url)
-    console.log(response)
+    fetch(url)
   }, [])
 
   // Warm server
@@ -34,14 +33,14 @@ export default function App() {
           <View className="w-[80%]">
             <Text className="text-[30px] font-bold">
               What do you want to play today?
-              </Text>
+            </Text>
           </View>
           <Link
             href="/DropIns"
             className="border rounded-xl p-4 w-[80%]"
           >Search</Link>
           <View className="flex flex-row">
-            <Volleyball/>
+            <Volleyball />
           </View>
         </View>
       </SafeAreaView>

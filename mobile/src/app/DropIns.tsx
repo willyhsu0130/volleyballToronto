@@ -7,12 +7,10 @@ import {
 import { useState, useEffect } from "react"
 import { useLocalSearchParams } from "expo-router"
 import { ResultCards } from '../components/ResultCards'
-import Constants from 'expo-constants';
 
 import { useFilters } from "@/context/FilterContext";
+import { useDropIns } from "@/context/DropInsContext";
 
-
-const SERVER_API = Constants.expoConfig?.extra?.SERVER_API;
 
 const DropIns = () => {
   const searchParams = useLocalSearchParams<{
@@ -22,67 +20,28 @@ const DropIns = () => {
     endDate?: string;
   }>();
 
-  // sportFromUrl is a string
   const sportsFromUrl = searchParams.sports
-  const [dropIns, setDropIns] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [query, setQuery] = useState("")
 
+  // const [query, setQuery] = useState("")
+  const { setFilters, } = useFilters() // Load filter from the context
+  const { dropIns, loading} = useDropIns()
 
-  const { filters, setFilters, } = useFilters()
-
-
-  // Need to update filters.sports immediately./
+  // Need to update filters.sports immediately
   useEffect(() => {
-
     if (sportsFromUrl) {
-      setFilters((prev) => {
-        if (prev.sports === sportsFromUrl) return prev
+      setFilters(prev => {
+        // only update if different
+        if (prev.sports.includes(sportsFromUrl)) return prev;
         return {
           ...prev,
-          sports: sportsFromUrl || ""
-        }
-      })
+          sports: [sportsFromUrl],
+        };
+      });
     }
 
-    const params = new URLSearchParams()
-    if (filters.beginDate) params.append("beginDate", filters.beginDate);
-    if (filters.endDate) params.append("endDate", filters.endDate);
-    if (filters.age) params.append("age", filters.age);
-    // if (filters.location) params.append("location", filters.location);
+  }, [setFilters, sportsFromUrl])
 
-    let sportPath = null
-    if (!Array.isArray(filters.sports)) {
-      sportPath = filters.sports
-    }
-    else {
-      sportPath = filters.sports.join(",")
-    }
-    const url = `${SERVER_API}times/${sportPath}${params.toString()}`
-    console.log(url)
-
-    const fetchResponse = fetch(url)
-      .then((res) => res.json())
-      .then((data) => {
-        setDropIns(data)
-        console.log(data)
-        setLoading(false)
-      })
-      .catch((err) => {
-        console.error("Error fetching drop-ins", err)
-        setLoading(false)
-      })
-    console.log(fetchResponse)
-  }, [
-    setFilters,
-    sportsFromUrl,
-    filters.age,
-    filters.beginDate,
-    filters.endDate,
-    filters.sports
-  ])
   if (loading) return <Text>Loading Drop Ins...</Text>
-
 
   return (
     <View className="gap-y-3 p-2">
@@ -103,11 +62,11 @@ interface SearchBarProps {
 
 const SearchBar = ({ className }: SearchBarProps) => {
 
-  const { filters, setFilters, resetFilters } = useFilters()
+  const { filters } = useFilters()
   const [searchInput, setSearchInput] = useState(filters?.sports)
 
   const handleSearchInputChange = (text: string) => {
-    setSearchInput(text);
+    setSearchInput([text]);
   }
 
   return (
@@ -117,14 +76,11 @@ const SearchBar = ({ className }: SearchBarProps) => {
           onChangeText={handleSearchInputChange}
           placeholder="Search for a sport or sports"
         />
-
       </View>
     </View>
   )
 
 
 }
-
-
 
 export default DropIns

@@ -2,12 +2,14 @@ import { useState, useEffect } from "react"
 import { Text, View } from "react-native"
 import { ResultCards } from "../../components/ResultCards"
 import { useLocalSearchParams } from "expo-router";
-import Constants from "expo-constants";
+import { useDropIns } from "@/context/DropInsContext";
+import { useFilters } from "@/context/FilterContext";
 
+import Constants from 'expo-constants';
 const SERVER_API = Constants.expoConfig?.extra?.SERVER_API;
 
 interface CommunityCenterData {
-    LocationId: string
+    LocationId: number
     ParentLocationId: string
     LocationName: string
     LocationType: string
@@ -27,77 +29,51 @@ interface CommunityCenterData {
 
 
 const CommunityCenter = () => {
-    const { communityCenterIdArray } = useLocalSearchParams()
-    const communityCenterId =
-        Array.isArray(communityCenterIdArray) ? communityCenterIdArray[0] : communityCenterIdArray;
+    //
+    const { communityCenterId } = useLocalSearchParams<{
+        communityCenterId?: string | string[];
+    }>();
+    const id = Array.isArray(communityCenterId) ? communityCenterId[0] : communityCenterId;
+    // Extracted Id
+    console.log(id)
 
-    console.log(communityCenterId)
-    const [loading, setLoading] = useState(true);
     const [communityCenterData, setCommunityCenterData] = useState<CommunityCenterData | { error: string }>()
-    const [dropIns, setDropIns] = useState([])
+    const { dropIns } = useDropIns()
+    const { filters, setFilters } = useFilters()
 
-    const [filters, setFilter] = useState({
-        sport: "Volleyball",
-        age: "",
-        beginDate: "",
-        endDate: "",
-        locationId: communityCenterId
-    })
+    // need to set locationId to communityCenterId before rendering dropIns results
     useEffect(() => {
-        // Safety Check
-        if (!communityCenterId) return
+        if (!id) return;
+        setFilters(prev => {
+            if (prev.locationId === Number(id)) return prev; // ✅ prevent redundant update
+            return { ...prev, locationId: Number(id) };
+        });
+    }, [id, setFilters]);
 
-        // Fetch community centers from API
-        const fetchCommunityCenter = async () => {
+
+    // Fetch community center data
+
+    useEffect(() => {
+        if (!id) return; // ✅ Safety check
+
+        const fetchCommunityCenterData = async () => {
             try {
-                const url = `${SERVER_API}locations/${communityCenterId}`
-                const res = await fetch(url)
-                if (!res.ok) throw new Error("Failed to fetch community center information")
+                const res = await fetch(`${SERVER_API}locations/${id}`);
+                if (!res.ok) throw new Error("Error connecting to server");
 
-                const data = await res.json()
-                setCommunityCenterData(data)
-
-                console.log("Data fetched: ", data)
-                setCommunityCenterData(data)
-
-
+                const data: CommunityCenterData = await res.json(); // 
+                setCommunityCenterData(data);
             } catch (err) {
-                console.log(err)
-                setCommunityCenterData({ error: "Error retrieving data" })
+                console.error("Failed to fetch community center:", err);
             }
+        };
+
+        fetchCommunityCenterData();
+    }, [id]); // 
 
 
-        }
 
-        const fetchDropIns = async () => {
-            try {
-                const params = new URLSearchParams()
-                if (filters.beginDate) params.append("beginDate", filters.beginDate)
-                if (filters.beginDate) params.append("endDate", filters.endDate)
-                if (filters.age) params.append("age", filters.age)
-                if (filters.locationId) params.append("locationId", filters.locationId)
 
-                const url = `${SERVER_API}times/${filters.sport}?${params.toString()}`
-                console.log("URL", url)
-                const res = await fetch(url)
-                if (!res.ok) throw new Error("Failed to fetch Drop Ins")
-
-                const data = await res.json()
-                setDropIns(data)
-                setLoading(false)
-                console.log("Fetched data:", data)
-
-            } catch (err) {
-                console.error("Error fetching Drop Ins", err)
-                setLoading(false)
-
-            }
-
-        }
-        fetchCommunityCenter()
-        fetchDropIns()
-
-    }, [communityCenterId, filters])
     if (!communityCenterData) return <Text>Loading Community Center...</Text>
     if ("error" in communityCenterData) return <Text>{communityCenterData.error}</Text>
 

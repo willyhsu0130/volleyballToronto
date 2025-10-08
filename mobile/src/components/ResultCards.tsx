@@ -5,6 +5,7 @@ import {
     FlatList
 } from "react-native"
 import { Link } from "expo-router";
+import { useDropIns } from "@/context/DropInsContext";
 
 interface ResultCardProp {
     item: {
@@ -45,7 +46,7 @@ const ResultCard = ({ item, linkToLocation }: ResultCardProp) => {
             <Text className="font-bold text-lg">{item.CourseTitle}</Text>
             {linkToLocation ? (
                 <Link href={`/locations/${item.LocationId}`}>
-                    <Text className="text-gray-700 underline">{item.LocationName}</Text>
+                    <Text className="text-gray-700 underline">{item.LocationName} {item.LocationId}</Text>
                 </Link>
             ) : (
                 <Text className="text-gray-700">{item.LocationName}</Text>
@@ -74,10 +75,10 @@ interface ResultCardsProps {
 
 export const ResultCards = ({
     className,
-    list,
     linkToLocation }: ResultCardsProps) => {
-    if (!Array.isArray(list)) {
-        console.warn("list is not an array: ", list)
+    const { dropIns } = useDropIns();
+    if (!Array.isArray(dropIns)) {
+        console.warn("list is not an array: ", dropIns)
         return (
             <View>
                 <Text>No Program Found</Text>
@@ -86,9 +87,9 @@ export const ResultCards = ({
     }
     return (
         <View className={className}>
-            <Text className="text-black font-bold mb-2">Search Results ({list.length})</Text>
+            <Text className="text-black font-bold mb-2">Search Results ({dropIns.length})</Text>
             <FlatList
-                data={list}
+                data={dropIns}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => (
                     <ResultCard item={item} linkToLocation={linkToLocation} />
