@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
-import { useFilters } from "./FilterContext";
+import { useFilters } from "./FilterContext"
 import Constants from 'expo-constants';
 
 const SERVER_API = Constants.expoConfig?.extra?.SERVER_API;

@@ -14,7 +14,7 @@ export default function RootLayout() {
             <DropInsProvider>
                 <React.Fragment>
                     <StatusBar style="auto" />
-                    <Tabs screenOptions={{ tabBarActiveTintColor: "teal" }}>
+                    <Tabs screenOptions={{ tabBarActiveTintColor: "teal", headerShown: false}}>
                         <Tabs.Screen
                             name="index"
                             options={{
