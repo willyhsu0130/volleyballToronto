@@ -61,14 +61,8 @@ export const DropInsProvider = ({ children }: { children: ReactNode }) => {
                 setLoading(false)
 
             } catch (err) {
-                console.error(err)
-                if (err instanceof Error) {
-                    throw new Error(err.message);
-                } else {
-                    throw new Error("Unknown error occurred while fetching drop-ins");
-                }
+                console.error("Error: ", err)
             }
-
         }
         fetchDropIns()
     }, [filters])

@@ -95,6 +95,7 @@ export const ResultCards = ({
                     <ResultCard item={item} linkToLocation={linkToLocation} />
                 )}
                 showsVerticalScrollIndicator={false}
+
             />
         </View>
     );

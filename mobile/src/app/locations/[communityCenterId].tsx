@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react"
-import { Text, View } from "react-native"
+import { Text, View} from "react-native"
 import { ResultCards } from "../../components/ResultCards"
 import { useLocalSearchParams } from "expo-router";
 import { useDropIns } from "@/context/DropInsContext";
 import { useFilters } from "@/context/FilterContext";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import Constants from 'expo-constants';
 const SERVER_API = Constants.expoConfig?.extra?.SERVER_API;
@@ -78,7 +79,7 @@ const CommunityCenter = () => {
     if ("error" in communityCenterData) return <Text>{communityCenterData.error}</Text>
 
     return (
-        <View className="flex flex-col min-h-screen p-2">
+        <SafeAreaView className="flex flex-col min-h-screen p-3">
             <View className="h-[15%]">
                 <Text className="text-3xl font-bold">{communityCenterData.LocationName}</Text>
                 <Text className="text-gray-700 leading-relaxed">
@@ -98,7 +99,7 @@ const CommunityCenter = () => {
             </View>
 
 
-        </View>
+        </SafeAreaView>
     )
 }
 export default CommunityCenter
