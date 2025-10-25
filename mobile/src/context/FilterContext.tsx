@@ -3,9 +3,9 @@ import React, { createContext, useContext, useState, ReactNode } from "react";
 // types in the fiter
 interface FilterState {
   sports: string[];
-  age: string;
-  beginDate: string;
-  endDate: string;
+  age: number | null;
+  beginDate: Date | null;
+  endDate: Date | null;
   locationId: number | undefined;
 }
 
@@ -25,33 +25,27 @@ const FilterContext = createContext<FilterContextType | undefined>(undefined);
 export const FilterProvider = ({ children }: { children: ReactNode }) => {
   const [filters, setFilters] = useState<FilterState>({
     sports: ["Volleyball"],
-    age: "",
-    beginDate: "",
-    endDate: "",
+    age: null,
+    beginDate: null,
+    endDate: null,
     locationId: undefined
   });
 
   const setBeginDate = (date: Date | null) => {
-    const dateString = date?.toISOString()
-    console.log(dateString, date)
-    if (dateString) {
-      setFilters(prev => ({ ...prev, beginDate: dateString }));
-    }
+    setFilters(prev => ({ ...prev, beginDate: date }));
+
   };
 
   const setEndDate = (date: Date | null) => {
-    const dateString = date?.toISOString()
-    if (dateString) {
-      setFilters(prev => ({ ...prev, endDate: dateString }));
-    }
+    setFilters(prev => ({ ...prev, endDate: date }));
   };
 
   const resetFilters = () => {
     setFilters({
       sports: [],
-      age: "",
-      beginDate: "",
-      endDate: "",
+      age: null,
+      beginDate: null,
+      endDate: null,
       locationId: undefined
     });
   };

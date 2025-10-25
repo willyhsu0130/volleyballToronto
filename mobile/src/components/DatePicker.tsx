@@ -62,11 +62,11 @@ const CreateCalendarArray = () => {
 };
 
 export const DatePicker = () => {
-    const { setFilters, filters } = useFilters()
-    const [calendar] = useState(CreateCalendarArray());
-    const [beginDate, setBeginDate] = useState<Date | null>(null)
-    const [endDate, setEndDate] = useState<Date | null>(null)
 
+
+    const { filters, setBeginDate, setEndDate } = useFilters()
+    const [calendar] = useState(CreateCalendarArray());
+    const { beginDate, endDate } = filters
 
     const handleDateChange = (date: Date) => {
         // Case 1: No dates selected yet
@@ -94,7 +94,6 @@ export const DatePicker = () => {
             return;
         }
     };
-
 
     return (
         <FlatList
@@ -124,8 +123,6 @@ const Month = ({ year, month, days, handleDateChange, beginDate, endDate }: Mont
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
     ];
-
-    console.log(days)
 
     return (
         <View style={styles.monthContainer}>

@@ -26,11 +26,14 @@ export const FilterModal = ({ modalVisible, setModalVisible }: FilterModalProps)
     const [selected, setSelected] = useState<string>("sport")
     const [date, setDate] = useState(new Date())
 
+    const handleSearch = () => {
+        setModalVisible(false)
+    }
 
     if (!modalVisible) return null
     return (
         modalVisible &&
-        <SafeAreaView className="bg-bgDark w-full h-full p-3 flex-col justify-around transition-all duration-300">
+        <SafeAreaView className="bg-bgDark w-full h-full p-3 flex-col justify-around  duration-300">
             <View className="flex-row justify-end">
                 <Pressable
                     className="aspect-square rounded-full bg-bgLight p-1"
@@ -47,13 +50,14 @@ export const FilterModal = ({ modalVisible, setModalVisible }: FilterModalProps)
             <AgeFilter selected={selected} setSelected={setSelected} />
 
             <LocationFilter selected={selected} setSelected={setSelected} />
-            
+
             <View className="h-[10%] flex-row justify-between">
                 <Pressable>
                     <Text>Reset Filters</Text>
 
                 </Pressable>
-                <Pressable>
+                <Pressable
+                    onPress={handleSearch}>
                     <Text>Search</Text>
 
                 </Pressable>
@@ -95,7 +99,7 @@ const SportFilter = ({ selected, setSelected }: FilterProps) => {
             {
                 selected === "sport" ?
                     <Pressable
-                        className={`bg-bg transition-all duration-300`}
+                        className={`bg-bg duration-300`}
                         style={[
                             styles.filtersContainer,
                             styles.sportFiltersContainer,

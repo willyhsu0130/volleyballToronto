@@ -36,10 +36,11 @@ export const DropInsProvider = ({ children }: { children: ReactNode }) => {
     const { filters } = useFilters()
 
     useEffect(() => {
+        console.log(filters)
         const params = new URLSearchParams()
-        if (filters.beginDate) params.append("beginDate", filters.beginDate);
-        if (filters.endDate) params.append("endDate", filters.endDate);
-        if (filters.age) params.append("age", filters.age);
+        if (filters.beginDate) params.append("beginDate", filters.beginDate.toISOString());
+        if (filters.endDate) params.append("endDate", filters.endDate.toISOString());
+        if (filters.age) params.append("age", filters.age.toString());
         if (filters.locationId) params.append("locationId", filters.locationId.toString());
         console.log("Params", params.toString())
 
@@ -64,7 +65,7 @@ export const DropInsProvider = ({ children }: { children: ReactNode }) => {
                 console.error("Error: ", err)
             }
         }
-        // fetchDropIns()
+        fetchDropIns()
         setLoading(false)
     }, [filters])
 
