@@ -64,7 +64,8 @@ export const DropInsProvider = ({ children }: { children: ReactNode }) => {
                 console.error("Error: ", err)
             }
         }
-        fetchDropIns()
+        // fetchDropIns()
+        setLoading(false)
     }, [filters])
 
     return (

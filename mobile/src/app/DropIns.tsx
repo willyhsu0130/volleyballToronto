@@ -5,8 +5,8 @@ import {
   TextInput,
   Pressable
 } from "react-native"
-import { useFocusEffect } from "@react-navigation/native"
-import { useState, useEffect, useLayoutEffect, useCallback } from "react"
+
+import { useState, useEffect, useLayoutEffect} from "react"
 import { useLocalSearchParams } from "expo-router"
 import { ResultCards } from '../components/ResultCards'
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,7 +16,7 @@ import { useDropIns } from "@/context/DropInsContext";
 import { Search } from "lucide-react-native"
 import { FilterModal } from "@/components/FilterModal";
 import { Announcement } from "@/components/Announcement";
-import { lightTheme, darkTheme } from "@/components/Themes";
+import { lightTheme } from "@/components/Themes";
 
 
 const DropIns = () => {

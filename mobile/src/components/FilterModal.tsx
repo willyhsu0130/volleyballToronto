@@ -8,8 +8,12 @@ import {
 } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { X, Search } from "lucide-react-native"
-import { lightTheme, darkTheme } from "@/components/Themes"
-import { useState, useRef } from "react"
+import { lightTheme } from "@/components/Themes"
+import { useState } from "react"
+import { DatePicker } from "./DatePicker"
+import { useFilters } from "@/context/FilterContext"
+
+
 
 interface FilterModalProps {
     modalVisible: boolean
@@ -20,6 +24,8 @@ interface FilterModalProps {
 export const FilterModal = ({ modalVisible, setModalVisible }: FilterModalProps) => {
     const [sportQuery, useSportQuery] = useState("")
     const [selected, setSelected] = useState<string>("sport")
+    const [date, setDate] = useState(new Date())
+
 
     if (!modalVisible) return null
     return (
@@ -34,6 +40,58 @@ export const FilterModal = ({ modalVisible, setModalVisible }: FilterModalProps)
                 </Pressable>
             </View>
 
+            <SportFilter selected={selected} setSelected={setSelected} />
+
+            <DateFilter selected={selected} setSelected={setSelected} />
+
+            <AgeFilter selected={selected} setSelected={setSelected} />
+
+            <LocationFilter selected={selected} setSelected={setSelected} />
+            
+            <View className="h-[10%] flex-row justify-between">
+                <Pressable>
+                    <Text>Reset Filters</Text>
+
+                </Pressable>
+                <Pressable>
+                    <Text>Search</Text>
+
+                </Pressable>
+            </View>
+        </SafeAreaView>
+    )
+}
+
+interface SportListProps {
+    sports: string[]
+}
+
+const SportList = ({ sports }: SportListProps) => {
+
+    return (
+        <FlatList
+            data={sports}
+            renderItem={({ item }) => (
+                <Pressable>
+
+                </Pressable>
+            )}
+            keyExtractor={(item, index) => index.toString()}
+
+
+        />
+    )
+
+}
+
+interface FilterProps {
+    selected: string
+    setSelected: React.Dispatch<React.SetStateAction<string>>
+}
+
+const SportFilter = ({ selected, setSelected }: FilterProps) => {
+    return (
+        <>
             {
                 selected === "sport" ?
                     <Pressable
@@ -73,7 +131,14 @@ export const FilterModal = ({ modalVisible, setModalVisible }: FilterModalProps)
                     </Pressable>
 
             }
+        </>
+    )
 
+}
+
+const DateFilter = ({ selected, setSelected }: FilterProps) => {
+    return (
+        <>
             {
                 selected === "date" ?
                     <Pressable className={`bg-bg transition-all duration-300`}
@@ -81,11 +146,13 @@ export const FilterModal = ({ modalVisible, setModalVisible }: FilterModalProps)
                         { height: selected === "date" ? "50%" : "9%" }
                         ]}
                     >
-                        <View className="flex-col">
+                        <View className="flex-col w-full">
                             <Text className="color-text font-extrabold text-2xl">When?</Text>
+                            <DatePicker />
                         </View>
                     </Pressable>
                     :
+                    // Collapsed Version
                     <Pressable className={`bg-bg transition-all duration-300`}
                         style={[styles.filtersContainer,
                         { height: selected === "date" ? "50%" : "9%" }
@@ -98,6 +165,14 @@ export const FilterModal = ({ modalVisible, setModalVisible }: FilterModalProps)
                     </Pressable>
 
             }
+        </>
+    )
+
+}
+
+const AgeFilter = ({ selected, setSelected }: FilterProps) => {
+    return (
+        <>
             {
                 selected === "age" ?
 
@@ -126,6 +201,14 @@ export const FilterModal = ({ modalVisible, setModalVisible }: FilterModalProps)
 
                     </Pressable>
             }
+        </>
+    )
+}
+
+
+const LocationFilter = ({ selected, setSelected }: FilterProps) => {
+    return (
+        <>
             {
                 selected === "location" ?
 
@@ -153,35 +236,13 @@ export const FilterModal = ({ modalVisible, setModalVisible }: FilterModalProps)
                         </View>
 
                     </Pressable>
-            }
-            <View className="h-[10%]">
-
-            </View>
-        </SafeAreaView>
+            }</>
     )
 }
 
-interface SportListProps {
-    sports: string[]
-}
-
-const SportList = ({ sports } : SportListProps) => {
-
-    return (
-        <FlatList
-            data={sports}
-            renderItem={({ item }) => (
-                <Pressable>
-
-                </Pressable>
-            )}
-            keyExtractor={(item, index) => index.toString()}
 
 
-        />
-    )
 
-}
 
 const styles = StyleSheet.create({
     filtersContainer: {
@@ -229,6 +290,18 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 4, // Android only
         borderRadius: 24,
+        backgroundColor: lightTheme.bgLight,
+        borderWidth: 3,
+        borderColor: lightTheme.bgLight,
+        borderTopColor: lightTheme.highlight
+    },
+    dateSelector: {
+        shadowColor: lightTheme.border,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+        elevation: 4, // Android only
+        borderRadius: 12,
         backgroundColor: lightTheme.bgLight,
         borderWidth: 3,
         borderColor: lightTheme.bgLight,

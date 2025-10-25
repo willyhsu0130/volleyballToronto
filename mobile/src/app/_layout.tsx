@@ -23,7 +23,7 @@ export default function RootLayout() {
                             options={{
                                 title: "Home",
                                 tabBarIcon: () => (
-                                    <Volleyball />
+                                    <Home />
                                 ),
 
                             }} />
@@ -33,7 +33,8 @@ export default function RootLayout() {
                             options={{
                                 title: "Drop Ins",
                                 tabBarIcon: () => (
-                                    <Home />
+                                    
+                                    <Volleyball />
                                 )
                             }}
 

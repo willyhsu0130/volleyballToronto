@@ -14,6 +14,8 @@ interface FilterContextType {
   filters: FilterState;
   setFilters: React.Dispatch<React.SetStateAction<FilterState>>;
   resetFilters: () => void;
+  setBeginDate: (date: Date | null) => void
+  setEndDate: (date: Date | null) => void
 }
 
 // Create the context usinng createContext() from react
@@ -29,6 +31,21 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
     locationId: undefined
   });
 
+  const setBeginDate = (date: Date | null) => {
+    const dateString = date?.toISOString()
+    console.log(dateString, date)
+    if (dateString) {
+      setFilters(prev => ({ ...prev, beginDate: dateString }));
+    }
+  };
+
+  const setEndDate = (date: Date | null) => {
+    const dateString = date?.toISOString()
+    if (dateString) {
+      setFilters(prev => ({ ...prev, endDate: dateString }));
+    }
+  };
+
   const resetFilters = () => {
     setFilters({
       sports: [],
@@ -40,7 +57,13 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <FilterContext.Provider value={{ filters, setFilters, resetFilters }}>
+    <FilterContext.Provider value={{
+      filters,
+      setFilters,
+      setBeginDate,
+      setEndDate,
+      resetFilters
+    }}>
       {children}
     </FilterContext.Provider>
   );
