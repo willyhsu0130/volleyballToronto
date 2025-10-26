@@ -16,6 +16,8 @@ interface FilterContextType {
   resetFilters: () => void;
   setBeginDate: (date: Date | null) => void
   setEndDate: (date: Date | null) => void
+  setSports: (sports: string[] | []) => void
+  setAge: (age: number | null) => void
 }
 
 // Create the context usinng createContext() from react
@@ -33,12 +35,19 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
 
   const setBeginDate = (date: Date | null) => {
     setFilters(prev => ({ ...prev, beginDate: date }));
-
   };
 
   const setEndDate = (date: Date | null) => {
     setFilters(prev => ({ ...prev, endDate: date }));
   };
+
+  const setSports = (sports: string[] | []) => {
+    setFilters(prev => ({ ...prev, sports: sports }))
+  }
+
+  const setAge = (age: number | null) => {
+    setFilters(prev => ({ ...prev, age: age }))
+  }
 
   const resetFilters = () => {
     setFilters({
@@ -56,7 +65,9 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
       setFilters,
       setBeginDate,
       setEndDate,
-      resetFilters
+      setSports,
+      resetFilters,
+      setAge
     }}>
       {children}
     </FilterContext.Provider>

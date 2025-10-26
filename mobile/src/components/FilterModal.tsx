@@ -12,6 +12,9 @@ import { lightTheme } from "@/components/Themes"
 import { useState } from "react"
 import { DatePicker } from "./DatePicker"
 import { useFilters } from "@/context/FilterContext"
+import RNPickerSelect from 'react-native-picker-select';
+
+
 
 
 
@@ -94,6 +97,15 @@ interface FilterProps {
 }
 
 const SportFilter = ({ selected, setSelected }: FilterProps) => {
+    const { setSports, filters } = useFilters()
+    const displaySports = () => {
+        if (filters.sports.length > 0) {
+            return filters.sports
+        } else {
+            return "Add Date"
+        }
+    }
+
     return (
         <>
             {
@@ -112,9 +124,9 @@ const SportFilter = ({ selected, setSelected }: FilterProps) => {
                             style={[styles.searchBar,
                             ]}>
 
-
                             <Search color={lightTheme.textMuted} />
                             <TextInput
+                                onChange={(e) => setSports([e.nativeEvent.text])}
                                 placeholder="Search"
                                 placeholderTextColor={lightTheme.textMuted}
                                 placeholderClassName="font-bold"
@@ -130,7 +142,7 @@ const SportFilter = ({ selected, setSelected }: FilterProps) => {
                         onPress={() => setSelected("sport")}>
                         <Text className="color-text">Sport</Text>
                         <View>
-                            <Text className="color-text font-bold">Add </Text>
+                            <Text className="color-text font-bold">{displaySports()} </Text>
                         </View>
                     </Pressable>
 
@@ -141,6 +153,17 @@ const SportFilter = ({ selected, setSelected }: FilterProps) => {
 }
 
 const DateFilter = ({ selected, setSelected }: FilterProps) => {
+    const { filters } = useFilters()
+
+    const displayDateRange = () => {
+        const { beginDate, endDate } = filters;
+        if (!beginDate && !endDate) return "Add Date";
+        const format = (date: Date) => date.toDateString();
+        return endDate
+            ? `${format(beginDate!)} ~ ${format(endDate)}`
+            : format(beginDate!);
+    };
+
     return (
         <>
             {
@@ -164,7 +187,7 @@ const DateFilter = ({ selected, setSelected }: FilterProps) => {
                         onPress={() => setSelected("date")}>
                         <Text className="color-text">Date Range</Text>
                         <View>
-                            <Text className="color-text font-bold">Add dates</Text>
+                            <Text className="color-text font-bold">{displayDateRange()}</Text>
                         </View>
                     </Pressable>
 
@@ -175,6 +198,20 @@ const DateFilter = ({ selected, setSelected }: FilterProps) => {
 }
 
 const AgeFilter = ({ selected, setSelected }: FilterProps) => {
+    const { setAge, filters } = useFilters()
+    const ages = Array.from({ length: 97 }, (_, i) => ({
+        label: `${i + 3}`,
+        value: i + 3,
+    }));
+
+    const displayAge = () =>{
+        const {age} = filters
+        if(age !== null){
+            return age
+        }else{
+            return "Add age"
+        }
+    }
     return (
         <>
             {
@@ -182,25 +219,36 @@ const AgeFilter = ({ selected, setSelected }: FilterProps) => {
 
                     <Pressable
                         className={`bg-bg transition-all duration-300`}
-                        style={[styles.expandedFiltersContainer,
-                        { height: selected === "age" ? "50%" : "9%" }
-                        ]}>
-                        <View className="flex-col">
+                        style={[styles.expandedFiltersContainer]}>
+                        <View className="flex-col w-full">
                             <Text className="color-text font-extrabold text-2xl">What is your age?</Text>
+                            <RNPickerSelect
+                                onValueChange={(value) => setAge(value)}
+                                items={ages}
+                                placeholder={{ label: "Select age...", value: null }}
+                                style={{
+                                    iconContainer: {
+                                        top: 20,
+                                        right: 10,
+                                    },
+                                    placeholder: {
+                                        color: lightTheme.text,
+                                        fontSize: 12,
+                                        fontWeight: 'bold',
+                                    },
+                                }}
+                            />
                         </View>
-
-
-                    </Pressable> :
+                    </Pressable>
+                    :
                     <Pressable
                         className={`bg-bg transition-all duration-300`}
-                        style={[styles.filtersContainer,
-                        { height: selected === "age" ? "50%" : "9%" }
-                        ]}
+                        style={styles.filtersContainer}
                         onPress={() => setSelected("age")}
                     >
                         <Text className="color-textMuted">Age</Text>
                         <View>
-                            <Text className="color-text font-bold">Add age</Text>
+                            <Text className="color-text font-bold">{displayAge()}</Text>
                         </View>
 
                     </Pressable>
@@ -250,6 +298,7 @@ const LocationFilter = ({ selected, setSelected }: FilterProps) => {
 
 const styles = StyleSheet.create({
     filtersContainer: {
+        height: "9%",
         shadowColor: lightTheme.border,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.15,
@@ -266,6 +315,7 @@ const styles = StyleSheet.create({
         padding: 15
     },
     expandedFiltersContainer: {
+        height: "50%",
         shadowColor: lightTheme.border,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.15,
@@ -310,5 +360,16 @@ const styles = StyleSheet.create({
         borderWidth: 3,
         borderColor: lightTheme.bgLight,
         borderTopColor: lightTheme.highlight
-    }
+    },
+    pickerContainer: {
+        top: 20,
+        right: 10,
+    },
+    pickerPlaceholder: {
+        color: 'purple',
+        fontSize: 12,
+        fontWeight: 'bold',
+    },
+
+
 })
