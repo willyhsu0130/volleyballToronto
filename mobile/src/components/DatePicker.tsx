@@ -13,6 +13,9 @@ import {
 import { lightTheme } from "./Themes";
 import { useFilters } from "@/context/FilterContext";
 
+const normalizeDate = (d: Date) =>
+    new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
 
 const getStartDayOfMonth = ({ year, month }: { year: number; month: number }) => {
     return {
@@ -64,14 +67,63 @@ const CreateCalendarArray = () => {
 export const DatePicker = () => {
 
 
+    const [selectedDateRange, setSelectedDateRange] = useState<string | null>(null)
+    const setToday = () => {
+        const date = new Date()
+        const normalized = normalizeDate(date);
+
+        const today = normalized
+        setBeginDate(today)
+        setEndDate(null)
+        setSelectedDateRange("today")
+        console.log(filters.beginDate, filters.endDate)
+    }
+
+    const setThisWeek = () => {
+        const date = normalizeDate(new Date())
+        const nextWeek = normalizeDate(new Date())
+        nextWeek.setDate(date.getDate() + 7)
+        setBeginDate(date)
+        setSelectedDateRange("this week")
+        setEndDate(nextWeek)
+    }
+
+    const setAllTime = () => {
+        setSelectedDateRange("all time")
+        setBeginDate(null)
+        setEndDate(null)
+    }
+
+
+    const displayDateRange = () => {
+        const { beginDate, endDate } = filters;
+        if (!beginDate && !endDate) return "Add Date";
+        const format = (date: Date) => date.toDateString();
+        if (beginDate && endDate === null) return `${format(beginDate!)} ~`
+        return endDate
+            ? `${format(beginDate!)} ~ ${format(endDate)}`
+            : format(beginDate!);
+    };
+
     const { filters, setBeginDate, setEndDate } = useFilters()
     const [calendar] = useState(CreateCalendarArray());
     const { beginDate, endDate } = filters
 
+    const dateOptionStyle = (option: string) => {
+
+
+        if (selectedDateRange === option) {
+            return [styles.dateOptionsSelected, styles.dateOptions]
+        }
+        return [styles.dateOptionsUnSelected, styles.dateOptions]
+    }
     const handleDateChange = (date: Date) => {
+
+        const normalized = normalizeDate(date);
+
         // Case 1: No dates selected yet
         if (!beginDate && !endDate) {
-            setBeginDate(date);
+            setBeginDate(normalized);
             return;
         }
 
@@ -79,33 +131,51 @@ export const DatePicker = () => {
         if (beginDate && !endDate) {
             if (date > beginDate) {
                 // valid range forward
-                setEndDate(date);
+                setEndDate(normalized);
             } else {
                 // clicked before begin — reset start
-                setBeginDate(date);
+                setBeginDate(normalized);
             }
             return;
         }
 
         // Case 3: Both selected → start a new selection
         if (beginDate && endDate) {
-            setBeginDate(date);
+            setBeginDate(normalized);
             setEndDate(null);
             return;
         }
     };
 
     return (
-        <FlatList
-            data={calendar}
-            keyExtractor={(item) => `${item.year}-${item.month}`}
-            renderItem={({ item }) => <Month
-                {...item}
-                handleDateChange={handleDateChange}
-                beginDate={beginDate}
-                endDate={endDate}
-            />}
-        />
+        <>
+            <FlatList
+                data={calendar}
+                keyExtractor={(item) => `${item.year}-${item.month}`}
+                renderItem={({ item }) => <Month
+                    {...item}
+                    handleDateChange={handleDateChange}
+                />}
+                extraData={[filters.beginDate, filters.endDate]}
+            />
+            <View className="flex-row justify-between">
+                <Pressable className=""
+                    style={dateOptionStyle("today")}
+                    onPress={setToday}>
+                    <Text className="font-bold">Today</Text>
+                </Pressable>
+                <Pressable className=""
+                    style={dateOptionStyle("this week")}
+                    onPress={setThisWeek}>
+                    <Text className="font-bold">This Week</Text>
+                </Pressable>
+                <Pressable className=""
+                    style={dateOptionStyle("all time")}
+                    onPress={setAllTime}>
+                    <Text className="font-bold">All Time</Text>
+                </Pressable>
+            </View>
+        </>
     );
 };
 
@@ -114,15 +184,29 @@ interface MonthProps {
     month: number;
     days: number[];
     handleDateChange: (date: Date) => void
-    beginDate: Date | null
-    endDate: Date | null
 }
 
-const Month = ({ year, month, days, handleDateChange, beginDate, endDate }: MonthProps) => {
+const Month = ({ year, month, days, handleDateChange }: MonthProps) => {
     const monthNames = [
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
     ];
+
+    const { filters } = useFilters()
+    const { beginDate, endDate } = filters
+
+    const getStatus = (day: number) => {
+        if (day === 0 || !beginDate) return "none";
+        const date = new Date(year, month - 1, day);
+
+        if (+beginDate === +date && !endDate) return "single";
+        if (+beginDate === +date && endDate) return "start"
+        if (endDate && +endDate === +date) return "end";
+        if (endDate && date > beginDate && date < endDate) return "between";
+
+        return "none"
+    }
+
 
     return (
         <View style={styles.monthContainer}>
@@ -138,8 +222,7 @@ const Month = ({ year, month, days, handleDateChange, beginDate, endDate }: Mont
                             day={item}
                             month={month}
                             year={year}
-                            beginDate={beginDate}
-                            endDate={endDate}
+                            status={getStatus(item)}
                             handleDateChange={handleDateChange}
                         />
                     )}
@@ -155,61 +238,63 @@ const Day = ({
     day,
     month,
     year,
-    beginDate,
-    endDate,
-    handleDateChange
+    handleDateChange,
+    status
 }: {
     day: number;
     month: number;
     year: number;
-    beginDate: Date | null
-    endDate: Date | null
     handleDateChange: (date: Date) => void
+    status: "none" | "start" | "end" | "between" | "single"
 }) => {
-    const date = new Date(year, month - 1, day)
-    const isSelected = (beginDate && +beginDate === +date || endDate && +endDate === +date);
-    const dateStyle = () => {
-        // If beginDate and endDate both don't exist, return default styling
-        // if date is neither endDate or beginDate nor in between them, show default styling
-        // If date is beginDate, show beginDate styling
-        // if date is endDate, show endDate stying
-        // If date is inbetweeen beginDate and endDate, show inbetween styling
 
-        if (beginDate === null && endDate === null) {
-            return styles.dayUnselected
-        } else if (beginDate && +beginDate === +date || endDate && +endDate === +date) {
-            return styles.dateSelected
-        } else if (beginDate && endDate && beginDate < date && endDate > date) {
-            return styles.betweenDates
-        } else {
-            return styles.dayUnselected
+
+    const date = new Date(year, month - 1, day)
+    const normalizeDate = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+    const isSelected = (status === "start" || status === "end") || status === "single";
+
+    const dateStyle = () => {
+        switch (status) {
+            case "single":
+                console.log(status)
+                return styles.dateSelected
+            case "start":
+                return styles.dateSelected;
+            case "end":
+                return styles.dateSelected;
+            default:
+                return styles.dayUnselected;
         }
     }
+
     const betweenStyle = () => {
-        if (beginDate === null || endDate === null) {
-            return {}
+        switch (status) {
+            case "start":
+                return styles.betweenBegin
+            case "end":
+                return styles.betweenEnd
+            case "none":
+                return styles.betweenDates
         }
-        if (+beginDate === +date) {
-            return styles.betweenBegin
-        } else if (+endDate === +date) {
-            return styles.betweenEnd
-        }
-        return {}
     }
 
 
     return (
         <View style={[{ flex: 1, alignItems: "center", position: "relative" },
         day === 0 ? { opacity: 0 } : { opacity: 100 },
-        beginDate && endDate && beginDate < date && endDate > date ? { backgroundColor: lightTheme.bgDark } : { backgroundColor: "transparent" }]}>
+        status === "between" ? { backgroundColor: lightTheme.bgDark } : { backgroundColor: "transparent" }]}>
             <Pressable
                 style={[styles.day, dateStyle()]}
                 onPress={() => {
                     handleDateChange(date)
                 }}>
-                <Text style={{ color: isSelected ? lightTheme.bgLight : lightTheme.text }}>{day}</Text>
+                <Text style={[
+                    { color: isSelected ? lightTheme.bgLight : lightTheme.text },
+                    +normalizeDate(date) < +normalizeDate(new Date()) ? styles.beforeToday : styles.afterToday
+                ]}>{day}</Text>
             </Pressable>
-            <View style={[betweenStyle(), {}]}>
+            <View style={betweenStyle()}>
 
             </View>
         </View>
@@ -226,7 +311,7 @@ const styles = StyleSheet.create({
     },
 
     day: {
-        height: 34,
+        height: 30,
         justifyContent: "center",
         alignItems: "center",
         width: "100%",
@@ -262,5 +347,31 @@ const styles = StyleSheet.create({
         left: 0,
         position: "absolute"
 
+    },
+    dateOptions: {
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        shadowColor: lightTheme.border,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+        elevation: 4, // Android only
+        borderRadius: 10,
+        backgroundColor: lightTheme.bgDark,
+        borderWidth: 3,
+        borderColor: lightTheme.bgDark,
+        borderTopColor: lightTheme.bg,
+    },
+    dateOptionsSelected: {
+        backgroundColor: lightTheme.bgDark
+    },
+    dateOptionsUnSelected: {
+
+    },
+    beforeToday: {
+        textDecorationLine: "line-through"
+    },
+    afterToday: {
+        textDecorationLine: "none"
     }
 })

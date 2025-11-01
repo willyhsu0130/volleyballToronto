@@ -18,6 +18,7 @@ interface FilterContextType {
   setEndDate: (date: Date | null) => void
   setSports: (sports: string[] | []) => void
   setAge: (age: number | null) => void
+  query: string | undefined
 }
 
 // Create the context usinng createContext() from react
@@ -28,10 +29,11 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
   const [filters, setFilters] = useState<FilterState>({
     sports: ["Volleyball"],
     age: null,
-    beginDate: null,
+    beginDate: new Date(),
     endDate: null,
     locationId: undefined
   });
+  const [query, setQuery] = useState(filters.sports[0] || undefined)
 
   const setBeginDate = (date: Date | null) => {
     setFilters(prev => ({ ...prev, beginDate: date }));
@@ -67,7 +69,8 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
       setEndDate,
       setSports,
       resetFilters,
-      setAge
+      setAge,
+      query
     }}>
       {children}
     </FilterContext.Provider>

@@ -3,7 +3,6 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  TouchableOpacity
 } from "react-native";
 
 import { Link } from "expo-router";
@@ -11,9 +10,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ReactNode, useEffect, useState } from "react";
 import Constants from 'expo-constants';
 import '../global.css';
-import { Volleyball, Search } from "lucide-react-native"
+import { Volleyball, Search, Icon } from "lucide-react-native"
+import { basketball, batBall, soccerBall, tennisBall } from '@lucide/lab';
 import { useColorScheme } from "nativewind";
 import { darkTheme, lightTheme } from "@/components/Themes";
+
+import { useFilters } from "@/context/FilterContext";
 
 
 
@@ -22,12 +24,6 @@ const SERVER_API = Constants.expoConfig?.extra?.SERVER_API;
 
 
 export default function App() {
-  const [query, setQuery] = useState("")
-  const [errorMessage, setErrorMessage] = useState()
-
-  const handleSearch = () => {
-
-  }
   const { colorScheme } = useColorScheme();
   console.log("Current theme:", colorScheme);
 
@@ -94,24 +90,37 @@ interface Sport {
 }
 
 const SportListItem = ({ sport, logo }: Sport) => {
+  const { setSports } = useFilters()
+  const handleOnPress = () => {
+    setSports([sport])
+  }
   return (
-    <TouchableOpacity className="p-5 aspect-square flex flex-col justify-around 
+    <View className="aspect-square flex flex-col justify-around 
     items-center gap-y-3 flex-1"
-      style={styles.sport}>
-      <Text className="text-1xl font-bold">{sport}</Text>
-      {logo}
-    </TouchableOpacity>
+      style={styles.sport}
+    >
+      <Link
+        href="/DropIns"
+        onPress={handleOnPress}>
+        <View className="p-5 aspect-square flex flex-col justify-around 
+    items-center gap-y-3 flex-1">
+          <Text className="text-1xl font-bold">{sport}</Text>
+          {logo}
+        </View>
+      </Link>
+    </View>
+
 
   )
 }
 
 const SportList = () => {
 
-  const [sports, setSports] = useState<Sport[]>([
+  const [sports] = useState<Sport[]>([
     { sport: "Volleyball", logo: <Volleyball size={60} /> },
-    { sport: "Basketball", logo: <Volleyball size={60} /> },
-    { sport: "Basketball", logo: <Volleyball size={60} /> },
-    { sport: "Basketball", logo: <Volleyball size={60} /> }
+    { sport: "Basketball", logo: <Icon iconNode={basketball}size={60} /> },
+    { sport: "Table Tennis", logo: <Icon iconNode={batBall}size={60} />},
+    { sport: "Soccer", logo: <Icon iconNode={soccerBall}size={60} /> }
   ])
   return (
     <FlatList<Sport>

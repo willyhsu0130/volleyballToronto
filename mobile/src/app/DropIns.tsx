@@ -6,7 +6,7 @@ import {
   Pressable
 } from "react-native"
 
-import { useState, useEffect, useLayoutEffect} from "react"
+import { useState, useEffect, useLayoutEffect } from "react"
 import { useLocalSearchParams } from "expo-router"
 import { ResultCards } from '../components/ResultCards'
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -31,8 +31,11 @@ const DropIns = () => {
   const sportsFromUrl = searchParams.sports
   const [modalVisible, setModalVisible] = useState(false)
   // Load from Context(s)
-  const { setFilters, } = useFilters() // Load filter from the context
+  const { setFilters, query } = useFilters() // Load filter from the context
   const { dropIns, loading } = useDropIns()
+  const getQuery = () => {
+    return query
+  }
 
   // Need to update filters.sports immediately
   useEffect(() => {
@@ -74,7 +77,7 @@ const DropIns = () => {
           style={styles.searchBar}
           onPress={() => setModalVisible(true)}>
           <Search color={lightTheme.textMuted} />
-          <Text className="color-textMuted font-bold">Search</Text>
+          <Text className="color-textMuted font-bold">{getQuery()}</Text>
         </Pressable>
       </View>
 
@@ -98,35 +101,6 @@ const DropIns = () => {
   )
 
 }
-interface SearchBarProps {
-  className: string;
-  setModalVisible: React.Dispatch<React.SetStateAction<boolean>>
-}
-
-export const SearchBar = ({ className, setModalVisible }: SearchBarProps) => {
-
-  const { filters } = useFilters()
-  const [searchInput, setSearchInput] = useState(filters?.sports)
-
-  const handleSearchInputChange = (text: string) => {
-    setSearchInput([text]);
-  }
-
-  return (
-    <View className={`${className}`}>
-      <Search color={"white"} />
-      <TextInput
-        className="color-white"
-        onChangeText={handleSearchInputChange}
-        placeholder="Search for a sport or sports"
-        placeholderTextColor={"white"}
-        onFocus={() => setModalVisible(true)}
-      />
-    </View>
-  )
-}
-
-
 const styles = StyleSheet.create({
   searchBar: {
     shadowColor: lightTheme.border,
