@@ -38,6 +38,12 @@ export const DropInsProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         console.log(filters)
         const params = new URLSearchParams()
+
+        // Turn sports into a comma seperate list
+
+        if (Array.isArray(filters.sports) && filters.sports.length > 0) {
+            params.append("sports", filters.sports.join(","));
+        }
         if (filters.beginDate) params.append("beginDate", filters.beginDate.toISOString());
         if (filters.endDate) params.append("endDate", filters.endDate.toISOString());
         if (filters.age) params.append("age", filters.age.toString());
@@ -45,11 +51,9 @@ export const DropInsProvider = ({ children }: { children: ReactNode }) => {
         console.log("Params", params.toString())
 
         // Find out if filters.sports is an array of strings or a string 
-        const sportPath = filters.sports.join(",");
         const query = params.toString();
-        const url = query
-            ? `${SERVER_API}times/${sportPath}?${query}`
-            : `${SERVER_API}times/${sportPath}`;
+        const url = `${SERVER_API}times${query ? `?${query}` : ""}`;
+
 
         console.log(url)
         const fetchDropIns = async () => {

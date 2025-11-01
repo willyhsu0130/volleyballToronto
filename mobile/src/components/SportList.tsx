@@ -70,10 +70,20 @@ interface SportListItemProps {
 
 
 const SportListItem = ({ sport, logo, handleOnPress }: SportListItemProps) => {
+    const [longPressed, setLongPressed] = useState(false)
+
+    const sportLisItemStyle = () => {
+        if (longPressed) return styles.SportListItemContainerLongPressed
+        return styles.SportListItemContainerNotPressed
+    }
+
     return (
         <Pressable className="flex-row items-center gap-x-3"
-            style={styles.SportListItemContainer}
+            style={[styles.SportListItemContainer, sportLisItemStyle()]}
             onPress={() => handleOnPress(sport)}
+            delayLongPress={100}
+            onLongPress={() => setLongPressed(true)}
+            onPressOut={() => setLongPressed(false)}
         >
             <View className="rounded-xl aspect-square bg-bgDark p-2">{logo}</View>
             <Text>{sport}</Text>
@@ -86,6 +96,13 @@ const styles = StyleSheet.create({
     SportListItemContainer: {
         width: "100%",
         paddingVertical: 5,
-    }
+        borderRadius: 20,
+        padding: 2
+    },
+    SportListItemContainerNotPressed: {
 
+    },
+    SportListItemContainerLongPressed: {
+        backgroundColor: lightTheme.bgDark
+    },
 })
