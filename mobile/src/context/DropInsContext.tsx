@@ -44,7 +44,7 @@ export const DropInsProvider = ({ children }: { children: ReactNode }) => {
         if (filters.locationId) params.append("locationId", filters.locationId.toString());
         console.log("Params", params.toString())
 
-        // Find out if filters.sports is an array of strings  or a string 
+        // Find out if filters.sports is an array of strings or a string 
         const sportPath = filters.sports.join(",");
         const query = params.toString();
         const url = query

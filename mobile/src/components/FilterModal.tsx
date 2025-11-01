@@ -28,14 +28,12 @@ export const FilterModal = ({ modalVisible, setModalVisible }: FilterModalProps)
     const [selected, setSelected] = useState<string>("sport")
 
     const handleResetFilters = () => {
-        setModalVisible(false)
         resetFilters()
     }
 
     const handleSearch = () => {
         setModalVisible(false)
     }
-
 
     if (!modalVisible) return null
     return (

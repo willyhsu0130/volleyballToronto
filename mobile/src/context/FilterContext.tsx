@@ -27,7 +27,7 @@ const FilterContext = createContext<FilterContextType | undefined>(undefined);
 // Creat the wrapper for the filte 
 export const FilterProvider = ({ children }: { children: ReactNode }) => {
   const [filters, setFilters] = useState<FilterState>({
-    sports: ["Volleyball"],
+    sports: [],
     age: null,
     beginDate: new Date(),
     endDate: null,

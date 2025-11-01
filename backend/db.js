@@ -137,14 +137,13 @@ export const getSportFromDB = async ({
     locationId,
     age
 }) => {
+    console.log("getSport from DB")
     const filter = {};
 
-    if (sports) {
-        if (Array.isArray(sports)) {
-            filter.CourseTitle = { $in: sports }; // match any sport in the list
-        } else {
-            filter.CourseTitle = sports; // single sport
-        }
+    if (Array.isArray(sports) && sports.length > 0) {
+        filter.CourseTitle = { $in: sports };
+    } else if (typeof sports === "string" && sports.trim() !== "") {
+        filter.CourseTitle = sports.trim();
     }
 
     // Location filter (by name, case-insensitive)
@@ -180,7 +179,7 @@ export const getSportFromDB = async ({
         .populate("LocationRef", "LocationName District StreetName StreetType")
         .sort({ BeginDate: 1 });
 
-    // console.log(results)
+    console.log(results)
     return results;
 };
 // q is a string rn.

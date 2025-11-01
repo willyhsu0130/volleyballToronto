@@ -21,8 +21,73 @@ app.listen(PORT, () => {
   console.log(`Server running at https://localhost:${PORT}`);
 });
 
-app.get("/times", async (req, res) =>{
-  return res.status(200).json([])
+app.get("/times", async (req, res) => {
+  console.log("/times endpoint")
+  try {
+    const { sports, beginDate, endDate, locationId, age } = req.query;
+    console.log(sports, beginDate, endDate, locationId, age)
+
+    let sportsArray = []
+
+    // Turn sports into sports Array
+    if (typeof sports === "string" && sports.trim().length > 0) {
+      sportsArray = sports
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+    }
+    // -------- Validation & Sanitization --------
+
+    let parsedBeginDate = null;
+    let parsedEndDate = null;
+
+    if (beginDate) {
+      const d = new Date(beginDate);
+      if (isNaN(d.getTime())) {
+        return res.status(400).json({ error: "Invalid beginDate" });
+      }
+      parsedBeginDate = d.toISOString(); // sanitize
+    }
+
+    if (endDate) {
+      const d = new Date(endDate);
+      if (isNaN(d.getTime())) {
+        return res.status(400).json({ error: "Invalid endDate" });
+      }
+      parsedEndDate = d.toISOString();
+    }
+
+    if (age) {
+      const parsedAge = Number(age);
+      if (isNaN(parsedAge)) {
+        return res.status(400).json({ error: "Age must be a number" });
+      }
+    }
+
+    let safeLocation = null;
+    if (locationId) {
+      const parsedLocationId = Number(locationId)
+      if (isNaN(parsedLocationId)) {
+        return res.status(400).json({ error: "Age must be a number" });
+      }
+      // trim & escape regex special chars to avoid ReDoS injection
+      safeLocation = locationId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+
+    const results = await getSportFromDB({
+      sports: sportsArray,
+      beginDate: parsedBeginDate,
+      endDate: parsedEndDate,
+      locationId: safeLocation,
+      age: age
+    });
+
+    res.json(results)
+
+  } catch (err) {
+    console.error("Error in /times route:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
 })
 
 
@@ -30,7 +95,7 @@ app.get("/times/:sports", async (req, res) => {
   try {
     // Turn to array
     const sports = req.params.sports
-    
+
     if (!sports || typeof sports !== "string") {
       return res.status(400).json({ error: "Invalid sports parameter" });
     }
@@ -39,12 +104,11 @@ app.get("/times/:sports", async (req, res) => {
       .map((s) => s.trim())            // remove spaces
       .filter((s) => s.length > 0);
 
-    console.log(sportsArray)
+
     const { beginDate, endDate, locationId, age } = req.query;
 
 
     // -------- Validation & Sanitization --------
-
 
     let parsedBeginDate = null;
     let parsedEndDate = null;

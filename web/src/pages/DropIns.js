@@ -13,7 +13,7 @@ const DropIns = () => {
   let sportsFromUrl
   if (searchParams?.get("sports")) {
     sportsFromUrl = [searchParams.get("sports")]
-  }else{
+  } else {
     sportsFromUrl = ""
   }
   console.log(sportsFromUrl)
@@ -33,17 +33,13 @@ const DropIns = () => {
   console.log("filters", filters)
   useEffect(() => {
     const params = new URLSearchParams();
+    if (filters.sports) params.append("sports", filters.sports)
     if (filters.beginDate) params.append("beginDate", filters.beginDate);
     if (filters.endDate) params.append("endDate", filters.endDate);
     if (filters.age) params.append("age", filters.age);
     if (filters.location) params.append("location", filters.location);
 
-    let sportPath
-    if (filters.sports.length === 1) {
-      sportPath = filters.sports[0]
-    }
-
-    const url = `${REACT_APP_SERVER_API}times/${sportPath}?${params.toString()}`;
+    const url = `${REACT_APP_SERVER_API}times/?${params.toString()}`;
     console.log(url)
     const fetchResponse = fetch(url)
       .then((res) => res.json())
@@ -93,8 +89,11 @@ const SearchBar = ({ className, setFilter, filters }) => {
   const handleAddFilter = (e) => {
     e.preventDefault();
 
-    const newSport = searchInput.trim();
+
+    const newSport = searchInput?.trim();
+
     if (!newSport) return; // ignore empty input
+    
 
     setFilter((prev) => {
       const currentSports = prev.sports || [];
