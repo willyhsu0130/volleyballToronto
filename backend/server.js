@@ -14,13 +14,13 @@ const PORT = process.env.PORT || 4000;
 const { dropResult } = await connectDB();
 
 app.use(cors());
-app.use(express.json()); // <-- THIS IS REQUIRED
+app.use(express.json());
 
 app.get("/", (req, res) => {
   return res.status(200).json([])
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, PORT, "0.0.0.0", () => {
   console.log(`Server running at https://localhost:${PORT}`);
 });
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDropIns } from "../context/DropInContext";
+import { ThumbsUp } from "lucide-react"
 
 export const Comments = ({ comments, dropInId }) => {
     const userId = 1; // temporary
@@ -31,10 +32,10 @@ export const Comments = ({ comments, dropInId }) => {
 
         try {
             const response = submitComment(tempComment)
+            if (!response) throw new Error("Something wrong with submitting comment")
         } catch (error) {
             console.log(error)
         }
-
     };
 
     return (
@@ -59,7 +60,7 @@ export const Comments = ({ comments, dropInId }) => {
                     </div>
                 </div>
             </div>
-            <div classNam="border border-black">
+            <div className="">
                 {localComments?.map((item, index) => (
                     <Comment key={index} item={item} />
                 ))}
@@ -72,7 +73,14 @@ export const Comments = ({ comments, dropInId }) => {
 const Comment = ({ item }) => {
     return (
         <div className="border-b py-2">
-            <p>{item.Content}</p>
+            <div>
+
+            </div>
+            <div>
+                <p>{item.UserId}</p>
+                <p>{item.Content}</p>
+                <p>{item.Likes}</p>
+            </div>
         </div>
     );
 };
