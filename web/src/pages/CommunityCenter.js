@@ -12,7 +12,7 @@ const CommunityCenter = () => {
     const { communityCenterId } = useParams()
     const [communityCenterData, setCommunityCenterData] = useState(null)
     const { dropIns, loading } = useDropIns()
-    const { filters, setLocationId } = useFilters()
+    const { setLocationId } = useFilters()
 
     useEffect(() => {
         if (!communityCenterId) return // safety check
@@ -33,11 +33,8 @@ const CommunityCenter = () => {
                 setCommunityCenterData({ error: "Error retrieving data" })
             }
         }
-    
-        fetchCommunityCenter()
         setLocationId(communityCenterId)
-
-
+        fetchCommunityCenter()
     }, [communityCenterId])
 
 

@@ -6,6 +6,7 @@ import { getTorontoData } from "./services/torontoData.js";
 import { configDotenv } from "dotenv";
 import { Location } from "./models/Location.js";
 import { DropIn } from "./models/DropIns.js";
+import { Comment } from "./models/Comment.js"
 
 try {
     configDotenv()
@@ -68,9 +69,9 @@ export const updateFromToronto = async () => {
                     { upsert: true }
 
                 )
-                console.log(response)
             }
         } catch (err) {
+            console.log(err)
             return (err)
         }
 
@@ -113,7 +114,6 @@ export const updateFromToronto = async () => {
                     },
                     { upsert: true }
                 )
-                console.log(response)
             }
 
         } catch (err) {
@@ -137,7 +137,6 @@ export const getSportFromDB = async ({
     locationId,
     age
 }) => {
-    console.log("getSport from DB")
     const filter = {};
 
     if (Array.isArray(sports) && sports.length > 0) {
@@ -173,13 +172,10 @@ export const getSportFromDB = async ({
         ];
     }
 
-    console.log("Final filter:", filter);
-
     const results = await DropIn.find(filter)
         .populate("LocationRef", "LocationName District StreetName StreetType")
         .sort({ BeginDate: 1 });
 
-    console.log(results)
     return results;
 };
 // q is a string rn.
@@ -211,8 +207,37 @@ export const getLocation = async ({ locationId }) => {
     let results = Location.findOne(
         { LocationId: locationId }
     );
+
     return results;
 };
+
+export const getDropInById = async ({ dropInId }) => {
+    let dropInResults = await DropIn.findOne(
+        { DropInId: dropInId }
+    ).populate("LocationRef", "LocationName District StreetName StreetType").lean()
+
+    let commentResults = await Comment.find(
+        { DropInId: dropInId }
+    ).lean()
+
+    const combined = {
+        ...dropInResults,       // spread dropIn fields
+        commentResults
+        // add comments array as a field
+    };
+
+    return combined;
+}
+
+
+export const updateComment = async ({ Content, DropInId, UserId }) => {
+    let updateResults = await Comment.insertOne({
+        DropInId: DropInId,
+        UserId: UserId,
+        Content: Content
+    })
+    console.log(updateResults)
+}
 
 const dateDataMerge = ({ date, hour, minute }) => {
     if (!date) {

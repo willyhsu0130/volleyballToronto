@@ -5,6 +5,7 @@ import { useState } from "react";
 import DropIns from "./pages/DropIns.js";
 import Locations from "./pages/Locations.js";
 import CommunityCenter from "./pages/CommunityCenter.js";
+import DropInProgram from "./pages/DropInProgram.js";
 
 const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API;
 
@@ -66,6 +67,7 @@ export default function App() {
                 <Route path="/dropins" element={<DropIns />} />
                 <Route path="/locations" element={<Locations />} />
                 <Route path="/locations/:communityCenterId" element={<CommunityCenter />} />
+                <Route path="/dropins/:dropInId" element={<DropInProgram />} />
               </Routes>
             </div>
           </DropInsProvider>

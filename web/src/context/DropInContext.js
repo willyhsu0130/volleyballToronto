@@ -20,8 +20,6 @@ export const DropInsProvider = ({ children }) => {
     const { filters } = useFilters()
 
     useEffect(() => {
-        console.log(filters)
-        console.log(loading)
         const params = new URLSearchParams()
 
         // Turn sports into a comma seperate list
@@ -41,7 +39,6 @@ export const DropInsProvider = ({ children }) => {
 
         console.log(url)
         const fetchDropIns = async () => {
-            console.log("dropIns running")
             try {
                 const res = await fetch(url)
                 if (!res.ok) throw new Error("Failed to fetch drop-ins");
@@ -53,15 +50,65 @@ export const DropInsProvider = ({ children }) => {
                 console.error("Error: ", err)
             }
         }
+
         fetchDropIns()
     }, [filters, loading])
+
+    const fetchDropInById = async (dropInId) => {
+        try {
+            // Fetch dropInData
+            const res = await fetch(`${SERVER_API}times/${dropInId}`)
+            if (!res.ok) throw new Error("Failed to fetch drop-ins");
+            const data = await res.json()
+
+            return data
+        } catch (error) {
+            console.error("Error:", error)
+        }
+    }
+
+    const submitComment = async ({ DropInId, UserId, Content }) => {
+        console.log(DropInId, UserId, Content)
+        try {
+            if (!UserId) throw new Error("userId is required to comment!")
+            // Check if the dropInId, userId, text is valid.
+
+            if (!Content || typeof text !== "string") throw new Error("Comment must contain any texts")
+            Content = Content.trim()
+
+            if (!DropInId) throw new Error("Error with dropInId")
+
+            const res = await fetch(`${SERVER_API}comments`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    Content: Content,
+                    CropInId: DropInId,
+                    UserId: UserId
+
+                })
+            })
+            if (!res.ok) throw new Error("Error commenting")
+            const updated = await fetchDropInById(DropInId);
+            return updated;
+
+        } catch (error) {
+            console.log(error)
+            return error
+        }
+
+    }
 
     return (
         <DropInsContext.Provider value={{
             dropIns,
             setDropIns,
             loading,
-            setLoading
+            setLoading,
+            fetchDropInById,
+            submitComment
         }}>
             {children}
         </DropInsContext.Provider>

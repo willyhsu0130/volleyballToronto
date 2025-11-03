@@ -26,7 +26,9 @@ const ResultCard = ({ item, linkToLocation }) => {
 
   return (
     <div className="bg-white p-4 rounded shadow hover:shadow-md hover:bg-gray-50 transition cursor-pointer">
-      <h3 className="font-bold text-lg">{item.CourseTitle}</h3>
+      <Link to={`/dropins/${item.DropInId}`}>
+        <h3 className="font-bold text-lg hover:underline">{item.CourseTitle}</h3>
+      </Link>
       {linkToLocation ? (
         <Link to={`/locations/${item.LocationId}`}>
           <p className="text-gray-700 hover:underline">{item.LocationName}</p>
