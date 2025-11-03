@@ -29,7 +29,8 @@ const Locations = () => {
   
   return (
     <div className="flex flex-col items-center w-full p-6">
-      <LocationQuery/>
+      {/* <LocationQuery/> */}
+      <p>Work In Progress</p>
     </div>
   );
 };

@@ -3,23 +3,16 @@ import { useParams } from "react-router-dom"
 import { ResultCards } from "../components/ResultCards"
 import { CalendarSchedule } from "../components/CalendarSchedule"
 import { GoogleMapsEmbed } from "../components/GoogleMaps"
+import { useFilters } from "../context/FiltersContext"
+import { useDropIns } from "../context/DropInContext"
 
 const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API
 
 const CommunityCenter = () => {
     const { communityCenterId } = useParams()
-    const [loading, setLoading] = useState(true);
     const [communityCenterData, setCommunityCenterData] = useState(null)
-    const [dropIns, setDropIns] = useState([])
-
-    const [filters, setFilter] = useState({
-        sport: "Volleyball",
-        age: "",
-        beginDate: "",
-        endDate: "",
-        locationId: communityCenterId
-    })
-
+    const { dropIns, loading } = useDropIns()
+    const { filters, setLocationId } = useFilters()
 
     useEffect(() => {
         if (!communityCenterId) return // safety check
@@ -39,37 +32,22 @@ const CommunityCenter = () => {
                 console.error(err)
                 setCommunityCenterData({ error: "Error retrieving data" })
             }
-            // Fetch all the drop in this location
         }
-
-        const fetchDropIns = async () => {
-            const params = new URLSearchParams()
-            if (filters.beginDate) params.append("beginDate", filters.beginDate)
-            if (filters.beginDate) params.append("endDate", filters.endDate)
-            if (filters.age) params.append("age", filters.age)
-            if (filters.locationId) params.append("locationId", filters.locationId)
-
-            const url = `${REACT_APP_SERVER_API}times/${filters.sport}?${params.toString()}`
-            console.log("URL", url)
-            fetch(url)
-                .then((res) => res.json())
-                .then((data) => {
-                    setDropIns(data)
-                    setLoading(false);
-                    console.log("Fetched data:", data)
-                })
-                .catch((err) => {
-                    console.error("Error fetching drop-ins:", err)
-                    setLoading(false);
-                })
-
-        }
+    
         fetchCommunityCenter()
-        fetchDropIns()
-    }, [communityCenterId, filters])
+        setLocationId(communityCenterId)
 
-    if (!communityCenterData) return <p>Loading community center...</p>
-    if (communityCenterData.error) return <p>{communityCenterData.error}</p>
+
+    }, [communityCenterId])
+
+
+    const isStillLoading = !communityCenterData || loading || communityCenterData.error;
+    if (isStillLoading) return (
+        <div className="flex justify-center">
+            <p>Loading...</p>
+        </div>
+    )
+    // if (communityCenterData.error) return <p>{communityCenterData.error}</p>
 
     return (
         <div className="flex flex-col min-h-screen overflow-y-auto">
@@ -96,8 +74,5 @@ const CommunityCenter = () => {
         </div>
     )
 }
-
-
-
 
 export default CommunityCenter

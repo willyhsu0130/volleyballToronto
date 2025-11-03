@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
+import { useDropIns } from "../context/DropInContext";
 
 const ResultCard = ({ item, linkToLocation }) => {
+
+
   if (!item.BeginDate || !item.EndDate) return null;
 
   const begin = new Date(item.BeginDate);
@@ -47,27 +50,29 @@ const ResultCard = ({ item, linkToLocation }) => {
 
 export const ResultCards = ({
   className,
-  list,
   linkToLocation
 }) => {
-  if (!Array.isArray(list)) {
-    console.warn("list is not an array:", list);
-    return (
-      <div className={`${className} flex flex-col items-center justify-center`}>
-        <p className="text-white font-bold">No programs found</p>
-      </div>
-    )
+
+  const { loading, dropIns } = useDropIns()
+
+  const displayMessage = () => {
+    if (loading) {
+      return "Loading Results..."
+    } else {
+      return <p>Search Results {dropIns?.length}</p>
+    }
   }
+
   return (
-    <>
-      {list &&
-        <div className={`${className}`}>
-          <p className="text-white">Search Results ( {list?.length} )</p>
-          {list &&
-            list?.map((item, index) => (
-              <ResultCard item={item} key={index} linkToLocation={linkToLocation} />
-            ))}
-        </div>}
-    </>
+    <div className={`${className}`}>
+      <p className="text-white">{displayMessage()}</p>
+      {
+        dropIns?.map((item, index) => (
+          <ResultCard item={item} key={index} linkToLocation={linkToLocation} />
+        ))
+      }
+    </div>
   )
+
 }
+

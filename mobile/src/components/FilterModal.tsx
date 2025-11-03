@@ -4,7 +4,6 @@ import {
     Text,
     TextInput,
     StyleSheet,
-    FlatList,
 } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { X, Search } from "lucide-react-native"
@@ -136,7 +135,6 @@ const SportFilter = ({ selected, setSelected }: FilterProps) => {
 
 const DateFilter = ({ selected, setSelected }: FilterProps) => {
     const { filters } = useFilters()
-
 
     const displayDateRange = () => {
         const { beginDate, endDate } = filters;

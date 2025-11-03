@@ -5,7 +5,7 @@ const Locations = () =>{
     const [query, setQuery] = useState("")
     return(
         <View>
-
+            
         </View>
     )
 }

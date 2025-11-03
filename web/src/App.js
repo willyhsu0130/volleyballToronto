@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from "react-router-dom";
+import { DropInsProvider } from "./context/DropInContext.js";
+import { FilterProvider } from "./context/FiltersContext.js"
 import { useState } from "react";
 import DropIns from "./pages/DropIns.js";
 import Locations from "./pages/Locations.js";
@@ -56,14 +58,18 @@ export default function App() {
         </div>
 
         {/* Main content */}
-        <div className="h-[92%] flex-1 w-full">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/dropins" element={<DropIns />} />
-            <Route path="/locations" element={<Locations />} />
-            <Route path="/locations/:communityCenterId" element={<CommunityCenter />} />
-          </Routes>
-        </div>
+        <FilterProvider>
+          <DropInsProvider>
+            <div className="h-[92%] flex-1 w-full">
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/dropins" element={<DropIns />} />
+                <Route path="/locations" element={<Locations />} />
+                <Route path="/locations/:communityCenterId" element={<CommunityCenter />} />
+              </Routes>
+            </div>
+          </DropInsProvider>
+        </FilterProvider>
       </Router>
     </div>
   );

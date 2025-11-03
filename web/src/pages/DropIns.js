@@ -3,6 +3,8 @@ import { useSearchParams } from "react-router-dom";
 import { ResultCards } from "../components/ResultCards";
 import { CalendarSchedule } from "../components/CalendarSchedule.js";
 import { FilterChips } from "../components/FilterChips.js"
+import { useDropIns } from "../context/DropInContext.js";
+import { useFilters } from "../context/FiltersContext.js";
 
 const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API;
 
@@ -17,8 +19,7 @@ const DropIns = () => {
     sportsFromUrl = ""
   }
   console.log(sportsFromUrl)
-  const [dropIns, setDropIns] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // const [dropIns, setDropIns] = useState([]);
   const [query, setQuery] = useState("")
 
   const [filters, setFilter] = useState({
@@ -31,45 +32,44 @@ const DropIns = () => {
   });
 
   console.log("filters", filters)
-  useEffect(() => {
-    const params = new URLSearchParams();
-    if (filters.sports) params.append("sports", filters.sports)
-    if (filters.beginDate) params.append("beginDate", filters.beginDate);
-    if (filters.endDate) params.append("endDate", filters.endDate);
-    if (filters.age) params.append("age", filters.age);
-    if (filters.location) params.append("location", filters.location);
+  // useEffect(() => {
+  //   const params = new URLSearchParams();
+  //   if (filters.sports) params.append("sports", filters.sports)
+  //   if (filters.beginDate) params.append("beginDate", filters.beginDate);
+  //   if (filters.endDate) params.append("endDate", filters.endDate);
+  //   if (filters.age) params.append("age", filters.age);
+  //   if (filters.location) params.append("location", filters.location);
 
-    const url = `${REACT_APP_SERVER_API}times/?${params.toString()}`;
-    console.log(url)
-    const fetchResponse = fetch(url)
-      .then((res) => res.json())
-      .then((data) => {
-        setDropIns(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching drop-ins:", err);
-        setLoading(false);
-      });
+  //   const url = `${REACT_APP_SERVER_API}times/?${params.toString()}`;
+  //   console.log(url)
+  //   const fetchResponse = fetch(url)
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       setDropIns(data);
+  //     })
+  //     .catch((err) => {
+  //       console.error("Error fetching drop-ins:", err);
+  //     });
 
-    console.log(fetchResponse)
-  }, [filters]);
+  //   console.log(fetchResponse)
+  // }, [filters]);
 
-  if (loading) return <p>Loading drop-ins...</p>;
+  const { dropIns, loading } = useDropIns()
 
   return (
     <div className="h-full flex flex-col bg-black">
       <SearchBar className="bg-white h-[10%] flex items-center gap-4 px-5" setFilter={setFilter} filters={filters} />
       <div className="h-[90%] w-screen flex">
-        <ResultCards className="w-[40%] h-full p-3 overflow-y-auto flex flex-col gap-y-3" list={dropIns} linkToLocation />
+        <ResultCards className="w-[40%] h-full p-3 overflow-y-auto flex flex-col gap-y-3" linkToLocation />
         <CalendarSchedule className="w-[60%] flex flex-col bg-white p-5 items-center justify-center font-bold" />
       </div>
     </div>
   );
 };
 
-const SearchBar = ({ className, setFilter, filters }) => {
+const SearchBar = ({ className }) => {
 
+  const { filters, setFilters } = useFilters()
   const [searchInput, setSearchInput] = useState()
 
   const handleSearchInputChange = (e) => {
@@ -80,7 +80,7 @@ const SearchBar = ({ className, setFilter, filters }) => {
     const { name, value } = e.target;
     const utcDate = new Date(`${value}T00:00:00-04:00`).toISOString();
 
-    setFilter((prev) => ({
+    setFilters((prev) => ({
       ...prev,
       [name]: utcDate,
     }));
@@ -93,9 +93,9 @@ const SearchBar = ({ className, setFilter, filters }) => {
     const newSport = searchInput?.trim();
 
     if (!newSport) return; // ignore empty input
-    
 
-    setFilter((prev) => {
+
+    setFilters((prev) => {
       const currentSports = prev.sports || [];
       // prevent duplicates (case-insensitive)
       if (currentSports.some(s => s.toLowerCase() === newSport.toLowerCase())) {
@@ -112,7 +112,7 @@ const SearchBar = ({ className, setFilter, filters }) => {
   }
 
   const handleRemoveFilter = (sportToRemove) => {
-    setFilter((prev) => ({
+    setFilters((prev) => ({
       ...prev,
       sports: prev.sports.filter((s) => s !== sportToRemove),
     }));
@@ -150,7 +150,7 @@ const SearchBar = ({ className, setFilter, filters }) => {
           type="number"
           min="6"
           className="flex-1 px-2 py-2 border rounded"
-          onChange={(e) => setFilter((prev) => ({ ...prev, age: e.target.value }))}
+          onChange={(e) => setFilters((prev) => ({ ...prev, age: e.target.value }))}
         />
 
         <input name="beginDate" type="date" className="flex-1 px-2 py-2 border rounded" onChange={handleDateChange} />
@@ -159,7 +159,7 @@ const SearchBar = ({ className, setFilter, filters }) => {
         <select
           name="location"
           className="flex-1 px-2 py-2 border rounded"
-          onChange={(e) => setFilter((prev) => ({ ...prev, location: e.target.value }))}
+          onChange={(e) => setFilters((prev) => ({ ...prev, location: e.target.value }))}
         >
           <option value="">Location</option>
         </select>
