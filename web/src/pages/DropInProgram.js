@@ -37,8 +37,6 @@ const DropInProgram = () => {
                 <p className="hover: underline"> at {dropIn?.LocationRef?.LocationName}</p>
             </Link>
 
-
-            {dropInId}
             {dropIn?.Age}
             {dropIn?.BeginDate}
             {dropIn?.EndDate}

@@ -4,6 +4,7 @@ import { ThumbsUp } from "lucide-react"
 
 export const Comments = ({ comments, dropInId }) => {
     const userId = 1; // temporary
+    const commentUserId = 1;
     const [commentField, setCommentField] = useState("");
     const [localComments, setLocalComments] = useState(comments ?? []);
 
@@ -72,14 +73,19 @@ export const Comments = ({ comments, dropInId }) => {
 
 const Comment = ({ item }) => {
     return (
-        <div className="border-b py-2">
+        <div className="border-b py-2 flex">
             <div>
-
+                LOGO
             </div>
             <div>
                 <p>{item.UserId}</p>
                 <p>{item.Content}</p>
                 <p>{item.Likes}</p>
+                <div className="flex gap-x-2">
+                    <ThumbsUp size={20} />
+                    <p>{10}</p>
+                </div>
+
             </div>
         </div>
     );
