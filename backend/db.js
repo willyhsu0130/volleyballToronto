@@ -176,6 +176,8 @@ export const getSportFromDB = async ({
         .populate("LocationRef", "LocationName District StreetName StreetType")
         .sort({ BeginDate: 1 });
 
+
+    console.log(results)
     return results;
 };
 // q is a string rn.
@@ -214,20 +216,19 @@ export const getLocation = async ({ locationId }) => {
 export const getDropInById = async ({ dropInId }) => {
     let dropInResults = await DropIn.findOne(
         { DropInId: dropInId }
-    ).populate("LocationRef", "LocationName District StreetName StreetType").lean()
-
-    let commentResults = await Comment.find(
-        { DropInId: dropInId }
-    ).lean()
-
-    const combined = {
-        ...dropInResults,       // spread dropIn fields
-        commentResults
-        // add comments array as a field
-    };
-
-    return combined;
+    ).populate("LocationRef", "LocationName District StreetName StreetType")
+    return dropInResults;
 }
+
+export const getCommentsByDropInId = async ({ dropInId }) => {
+    const commentResults = await Comment.find(
+        { DropInId: dropInId }
+    ).sort({ createdAt: -1 })
+        .lean()
+
+    return commentResults;
+}
+
 
 
 export const updateComment = async ({ Content, DropInId, UserId }) => {

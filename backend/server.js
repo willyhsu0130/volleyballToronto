@@ -6,7 +6,8 @@ import {
   getLocations,
   getLocation,
   getDropInById,
-  updateComment
+  updateComment,
+  getCommentsByDropInId
 } from "./db.js";
 
 const app = express();
@@ -23,16 +24,16 @@ app.get("/", (req, res) => {
 const startServer = async () => {
   try {
     const { dropResult } = await connectDB(); // your DB connection
-    console.log("✅ Database connected:", !!dropResult);
+    console.log("Database connected:", !!dropResult);
 
     app.listen(PORT, "0.0.0.0", () => {
-      console.log(`✅ Server running at http://localhost:${PORT}`);
+      console.log(`Server running at http://localhost:${PORT}`);
     });
   } catch (err) {
-    console.error("❌ Error connecting to database:", err);
+    console.error("Error connecting to database:", err);
     // Even if DB fails, keep the server alive to avoid Render timeout
     app.listen(PORT, "0.0.0.0", () => {
-      console.log(`⚠️ Server running without DB connection on port ${PORT}`);
+      console.log(`Server running without DB connection on port ${PORT}`);
     });
   }
 };
@@ -115,14 +116,15 @@ app.get("/times/:dropInId", async (req, res) => {
       return res.status(400).json({ error: "Drop In ID is required" });
     }
 
-    const results = await getDropInById({ dropInId });
+    // Fetch drop in 
+    const dropInResults = await getDropInById({ dropInId })
 
-    if (!results) {
+    if (!dropInResults) {
       return res.status(404).json({ error: "Drop In not found" });
     }
 
-    console.log("getDropInById result:", results);
-    return res.json(results);
+    console.log({ dropInResults })
+    res.json(dropInResults);
 
   } catch (error) {
     console.error("Error fetching drop-in:", error);
@@ -165,6 +167,27 @@ app.get("/locations/:communityCenterId", async (req, res) => {
   }
 });
 
+
+app.get("/comments/:dropInId", async (req, res) => {
+  try {
+    const { dropInId } = req.params
+
+    if (!dropInId) {
+      return res.status(400).json({ error: "Drop In ID is required" });
+    }
+
+    // Fetch drop in 
+    const commentResults = await getCommentsByDropInId({ dropInId })
+
+    if (!commentResults) res.status(404).json({ error: "comments not found" })
+
+    res.json(commentResults)
+
+  } catch (error) {
+    console.log(error)
+  }
+
+})
 
 app.post("/comments", async (req, res) => {
   console.log("Comments endpoint received")
