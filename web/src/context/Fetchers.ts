@@ -82,7 +82,7 @@ export const signup = async ({
 
         if (!password || typeof password !== "string") throw new Error("password is required to signup")
 
-        const res = await fetch(`${SERVER_API}signup`, {
+        const res = await fetch(`${SERVER_API}auth/signup`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

@@ -74,7 +74,7 @@ export const DropInsProvider = ({ children }: { children: ReactNode }) => {
 
         // Find out if filters.sports is an array of strings or a string 
         const query = params.toString();
-        const url = `${SERVER_API}times${query ? `?${query}` : ""}`;
+        const url = `${SERVER_API}dropIns${query ? `?${query}` : ""}`;
 
         console.log(url)
         const fetchDropIns = async () => {
@@ -96,7 +96,7 @@ export const DropInsProvider = ({ children }: { children: ReactNode }) => {
     const fetchDropInById = async (dropInId: number) => {
         try {
             // Fetch dropInData
-            const res = await fetch(`${SERVER_API}times/${dropInId}`)
+            const res = await fetch(`${SERVER_API}dropIns/${dropInId}`)
             if (!res.ok) throw new Error("Failed to fetch drop-ins");
             const data = await res.json()
             return data
