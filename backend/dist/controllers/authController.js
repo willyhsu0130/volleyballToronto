@@ -1,6 +1,6 @@
-import { signUp } from "../services/authService";
-import { AppError } from "../utils/AppError";
-import { catchAsync } from "../utils/catchAsync";
+import { signUp } from "../services/authService.js";
+import { AppError } from "../utils/AppError.js";
+import { catchAsync } from "../utils/catchAsync.js";
 export const signupController = catchAsync(async (req, res, next) => {
     const { username, email, password } = req.body;
     if (!username || !email || !password) {

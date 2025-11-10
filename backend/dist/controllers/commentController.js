@@ -1,4 +1,4 @@
-import { getCommentsByDropInId, updateComment } from "../services/commentService";
+import { getCommentsByDropInId, updateComment } from "../services/commentService.js";
 // GET /comments/:dropInId
 export const getCommentsByDropIn = async (req, res, next) => {
     try {

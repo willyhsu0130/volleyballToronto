@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { getSportFromDB, getDropInById as DBgetDropInById } from "../services/dropInService";
+import { getSportFromDB, getDropInById as DBgetDropInById } from "../services/dropInService.js";
 
 // Utility: escape special characters (useful for string filters)
 const escapeRegex = (str: string): string => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

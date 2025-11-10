@@ -1,4 +1,4 @@
-import { getSportFromDB, getDropInById as DBgetDropInById } from "../services/dropInService";
+import { getSportFromDB, getDropInById as DBgetDropInById } from "../services/dropInService.js";
 // Utility: escape special characters (useful for string filters)
 const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 export const getDropIns = async (req, res, next) => {

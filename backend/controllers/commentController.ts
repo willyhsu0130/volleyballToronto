@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { getCommentsByDropInId, updateComment } from "../services/commentService";
+import { getCommentsByDropInId, updateComment } from "../services/commentService.js";
 
 // GET /comments/:dropInId
 export const getCommentsByDropIn = async (req: Request, res: Response, next: NextFunction) => {

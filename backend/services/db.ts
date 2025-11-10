@@ -3,7 +3,6 @@ import { configDotenv } from "dotenv";
 import { getTorontoData } from "./torontoData.js";
 import { Location } from "../models/Location.js";
 import { DropIn } from "../models/DropIns.js";
-import type { IDropIn } from "../models/DropIns.js";
 
 // Load environment variables
 try {

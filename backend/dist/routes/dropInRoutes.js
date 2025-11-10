@@ -1,5 +1,5 @@
 import express from "express";
-import { getDropIns, getDropInById } from "../controllers/dropInController";
+import { getDropIns, getDropInById } from "../controllers/dropInController.js";
 const router = express.Router();
 router.get("/", getDropIns);
 router.get("/:dropInId", getDropInById);
