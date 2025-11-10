@@ -1,7 +1,7 @@
 // controllers/authController.ts
 import { Request, Response, NextFunction } from "express";
-import { signUp } from "../services/authService.ts";
-import { AppError } from "../utils/AppError.ts";
+import { signUp } from "../services/authService";
+import { AppError } from "../utils/AppError";
 import { catchAsync } from "../utils/catchAsync";
 
 export const signupController = catchAsync(
