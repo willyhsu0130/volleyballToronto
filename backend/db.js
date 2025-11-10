@@ -7,6 +7,7 @@ import { configDotenv } from "dotenv";
 import { Location } from "./models/Location.js";
 import { DropIn } from "./models/DropIns.js";
 import { Comment } from "./models/Comment.js"
+import { User } from "./models/User.js"
 
 try {
     configDotenv()
@@ -175,9 +176,6 @@ export const getSportFromDB = async ({
     const results = await DropIn.find(filter)
         .populate("LocationRef", "LocationName District StreetName StreetType")
         .sort({ BeginDate: 1 });
-
-
-    console.log(results)
     return results;
 };
 // q is a string rn.
@@ -239,6 +237,33 @@ export const updateComment = async ({ Content, DropInId, UserId }) => {
     })
     console.log(updateResults)
 }
+
+export const getRatingFromDropInId = async ({ Content, DropInId, UserId }) => {
+    let updateResults = await Comment.insertOne({
+        DropInId: DropInId,
+        UserId: UserId,
+        Content: Content
+    })
+    console.log(updateResults)
+}
+
+export const signUp = async ({ username, email, password }) => {
+    try {
+        let signUpResults = await User.create({
+            Username: username,
+            Email: email,
+            Password: password
+        });
+        console.log(signUpResults)
+        return (signUpResults)
+
+    } catch (error) {
+        return new Error("Trouble signing up")
+    }
+
+
+}
+
 
 const dateDataMerge = ({ date, hour, minute }) => {
     if (!date) {

@@ -6,8 +6,10 @@ import DropIns from "./pages/DropIns.tsx";
 import Locations from "./pages/Locations.tsx";
 import CommunityCenter from "./pages/CommunityCenter.tsx";
 import DropInProgram from "./pages/DropInProgram.tsx";
+import Login from "./pages/(auth)/Login.tsx";
+import Signup from "./pages/(auth)/SignUp.tsx";
 
-const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API as URL ?? "";
+const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API || "localhost:3000";
 
 function HomePage() {
   const [query, setQuery] = useState("");
@@ -52,10 +54,15 @@ export default function App() {
       <title>DropInToronto</title>
       <Router>
         {/* Top nav */}
-        <div className="h-[8%] flex items-center justify-start bg-black gap-10 px-20 text-white">
-          <Link to="/" className="font-bold text-xl">DropInToronto</Link>
-          <Link to="/dropins" className="text-sm font-bold">Dropins</Link>
-          <Link to="/locations" className="text-sm font-bold">Locations</Link>
+        <div className="h-[8%] flex items-center justify-between bg-black">
+          <div className="flex items-center gap-10 px-20 text-white">
+            <Link to="/" className="font-bold text-xl">DropInToronto</Link>
+            <Link to="/dropins" className="text-sm font-bold">Dropins</Link>
+            <Link to="/locations" className="text-sm font-bold">Locations</Link>
+          </div>
+          <div className="text-white flex items-center gap-10 px-5">
+            <Link to="/login" className="text-sm font-bold">Login</Link>
+          </div>
         </div>
 
         {/* Main content */}
@@ -68,6 +75,8 @@ export default function App() {
                 <Route path="/locations" element={<Locations />} />
                 <Route path="/locations/:communityCenterId" element={<CommunityCenter />} />
                 <Route path="/dropins/:dropInId" element={<DropInProgram />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
               </Routes>
             </div>
           </DropInsProvider>

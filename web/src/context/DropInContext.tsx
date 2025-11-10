@@ -34,6 +34,11 @@ interface DropInsContextType {
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
     fetchDropInById: (dropInId: number) => Promise<DropIn | null>
     fetchCommentsByDropInId: (dropInId: number) => Promise<CommentType[] | null>
+    signup: (data: {
+        username: string
+        email: string
+        password: string
+    }) => void
     submitComment: (comment: {
         DropInId: number
         UserId: number
@@ -99,7 +104,6 @@ export const DropInsProvider = ({ children }: { children: ReactNode }) => {
             console.error("Error:", error)
         }
     }
-
     const fetchCommentsByDropInId = async (dropInId: number) => {
         try {
             // Fetch comments data
@@ -152,6 +156,41 @@ export const DropInsProvider = ({ children }: { children: ReactNode }) => {
         }
 
     }
+    const signup = async ({
+        username,
+        email,
+        password
+    }: {
+        username: string
+        email: string
+        password: String
+    }) => {
+        try {
+            if (!username || typeof username !== "string") throw new Error("username is required to signup")
+            // Check if the dropInId, userId, text is valid.
+
+            if (!email || typeof email !== "string") throw new Error("email is required")
+            email = email.trim()
+
+            if (!password || typeof password !== "string") throw new Error("password is required to signup")
+
+            const res = await fetch(`${SERVER_API}signup`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username: username,
+                    email: email,
+                    password: password
+                })
+            })
+            console.log(res)
+        } catch (error) {
+            console.log(error)
+        }
+
+    }
 
     return (
         <DropInsContext.Provider value={{
@@ -161,7 +200,8 @@ export const DropInsProvider = ({ children }: { children: ReactNode }) => {
             setLoading,
             fetchDropInById,
             submitComment,
-            fetchCommentsByDropInId
+            fetchCommentsByDropInId,
+            signup
         }}>
             {children}
         </DropInsContext.Provider>

@@ -35,7 +35,7 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
     endDate: null,
     locationId: null
   });
-  const [query, setQuery] = useState(filters.sports[0] || undefined)
+  const [query] = useState(filters.sports[0] || undefined)
 
   const setBeginDate = (date: Date | null) => {
     setFilters(prev => ({ ...prev, beginDate: date }));

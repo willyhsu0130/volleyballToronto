@@ -5,25 +5,25 @@ const SALT_ROUNDS = 12; // safe default for modern CPUs
 
 const userSchema = new mongoose.Schema(
   {
-    username: {
+    Username: {
       type: String,
       required: true,
       unique: true,
       trim: true
     },
-    email: {
+    Email: {
       type: String,
       required: true,
       unique: true,
       lowercase: true,
       trim: true
     },
-    password: {
+    Password: {
       type: String,
       required: true,
-      select: false 
+      select: false
     },
-    role: {
+    Role: {
       type: String,
       enum: ["user", "admin"],
       default: "user"
@@ -37,14 +37,13 @@ userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
 
   const salt = await bcrypt.genSalt(SALT_ROUNDS);
-  this.password = await bcrypt.hash(this.password, salt);
+  this.Password = await bcrypt.hash(this.Password, salt);
   next();
 });
 
 // Compare raw password to stored hash
 userSchema.methods.comparePassword = async function (candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password);
+  return bcrypt.compare(candidatePassword, this.Password);
 };
 
-const User = mongoose.model("User", userSchema);
-export default User;
+export const User = mongoose.model("User", userSchema);

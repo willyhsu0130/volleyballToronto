@@ -7,8 +7,10 @@ import {
   getLocation,
   getDropInById,
   updateComment,
-  getCommentsByDropInId
+  getCommentsByDropInId,
+  signUp
 } from "./db.js";
+import validator from "validator"
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -123,7 +125,6 @@ app.get("/times/:dropInId", async (req, res) => {
       return res.status(404).json({ error: "Drop In not found" });
     }
 
-    console.log({ dropInResults })
     res.json(dropInResults);
 
   } catch (error) {
@@ -131,7 +132,6 @@ app.get("/times/:dropInId", async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 })
-
 
 app.get("/locations", async (req, res) => {
 
@@ -167,7 +167,6 @@ app.get("/locations/:communityCenterId", async (req, res) => {
   }
 });
 
-
 app.get("/comments/:dropInId", async (req, res) => {
   try {
     const { dropInId } = req.params
@@ -197,3 +196,71 @@ app.post("/comments", async (req, res) => {
   const response = await updateComment({ Content, DropInId, UserId })
   res.json({ success: true, message: "Comment received!" });
 })
+
+app.post("/signup", async (req, res) => {
+  try {
+    let { username, email, password } = req.body;
+
+    // ----------- BASIC VALIDATION & SANITIZATION -----------
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: "All fields are required." });
+    }
+
+    // Trim whitespace
+    username = username.trim();
+    email = email.trim();
+    password = password.trim();
+
+    // Validate username
+    if (username.length < 3 || username.length > 20) {
+      return res
+        .status(400)
+        .json({ error: "Username must be between 3 and 20 characters." });
+    }
+
+    // Sanitize username (remove unsafe characters)
+    username = validator.blacklist(username, "<>{}()$%&/\\'\"`~|;:");
+
+    // Check if username exists
+
+    // // Validate email format
+    // if (!validator.isEmail(email)) {
+    //   return res.status(400).json({ error: "Invalid email format." });
+    // }
+
+    // // Normalize email (lowercase + canonical form)
+    // email = validator.normalizeEmail(email);
+
+    // // Validate password length
+    // if (password.length < 8) {
+    //   return res
+    //     .status(400)
+    //     .json({ error: "Password must be at least 8 characters long." });
+    // }
+
+    // // Optional: enforce strong password
+    // if (
+    //   !validator.isStrongPassword(password, {
+    //     minLength: 8,
+    //     minLowercase: 1,
+    //     minUppercase: 1,
+    //     minNumbers: 1,
+    //     minSymbols: 0
+    //   })
+    // ) {
+    //   return res.status(400).json({
+    //     error:
+    //       "Password must include uppercase, lowercase, and numbers."
+    //   });
+    // }
+
+    // ----------- SAFE CALL TO SIGNUP SERVICE -----------
+    const signUpResponse = await signUp({ username, email, password });
+    console.log("signupResponse", signUpResponse)
+    console.log(signUpResponse.Error)
+    return res.status(200).json(signUpResponse);
+  } catch (error) {
+    console.error("Error in /signup:", Error);
+    return res.status(500).json({ error });
+  }
+});
