@@ -1,10 +1,11 @@
 import { DropIn } from "../models/DropIns.js";
 export const getSportFromDB = async ({ sports, beginDate, endDate, locationId, age }) => {
     const filter = {};
+    // Add the filter objects
     if (Array.isArray(sports) && sports.length > 0) {
         filter.CourseTitle = { $in: sports };
     }
-    else if (typeof sports === "string" && sports.trim() !== "") {
+    else if (sports && typeof sports === "string" && sports.trim() !== "") {
         filter.CourseTitle = sports.trim();
     }
     // Location filter (by name, case-insensitive)

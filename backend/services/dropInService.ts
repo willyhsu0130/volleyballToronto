@@ -1,4 +1,13 @@
-import { DropIn } from "../models/DropIns.js";
+import { FilterQuery } from "mongoose";
+import { DropIn, IDropIn } from "../models/DropIns.js";
+
+interface IgetSportFromDB {
+    sports: string[] | string | null
+    beginDate: Date | null
+    endDate: Date | null
+    locationId: number | null
+    age: number | null
+}
 
 export const getSportFromDB = async ({
     sports,
@@ -6,12 +15,12 @@ export const getSportFromDB = async ({
     endDate,
     locationId,
     age
-}) => {
-    const filter = {};
-
+}: IgetSportFromDB) => {
+    const filter: FilterQuery<IDropIn> = {};
+    // Add the filter objects
     if (Array.isArray(sports) && sports.length > 0) {
         filter.CourseTitle = { $in: sports };
-    } else if (typeof sports === "string" && sports.trim() !== "") {
+    } else if (sports && typeof sports === "string" && sports.trim() !== "") {
         filter.CourseTitle = sports.trim();
     }
 
@@ -49,7 +58,7 @@ export const getSportFromDB = async ({
 };
 // q is a string rn.
 
-export const getDropInById = async ({ dropInId }) => {
+export const getDropInById = async ({ dropInId }: { dropInId: number }) => {
     let dropInResults = await DropIn.findOne(
         { DropInId: dropInId }
     ).populate("LocationRef", "LocationName District StreetName StreetType")

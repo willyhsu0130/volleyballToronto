@@ -42,7 +42,7 @@ userSchema.pre("save", async function (next) {
 });
 
 // Compare raw password to stored hash
-userSchema.methods.comparePassword = async function (candidatePassword) {
+userSchema.methods.comparePassword = async function (candidatePassword: string) {
   return bcrypt.compare(candidatePassword, this.Password);
 };
 

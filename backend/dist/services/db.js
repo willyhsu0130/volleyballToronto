@@ -1,119 +1,120 @@
-// db.js is in charge of getting of pulling data from the toronto by importing the torontoData service 
-// then it pushes the data into mongodb
 import mongoose from "mongoose";
-import { getTorontoData } from "./torontoData.js";
 import { configDotenv } from "dotenv";
+import { getTorontoData } from "./torontoData.js";
+import { Location } from "../models/Location.js";
+import { DropIn } from "../models/DropIns.js";
+// Load environment variables
 try {
     configDotenv();
 }
 catch (err) {
-    console.log(err);
+    console.error("Failed to load .env:", err);
 }
+// ---------- Database Connection ----------
 export async function connectDB() {
     try {
-        await mongoose.connect(process.env.MONGO_URI, {
-            dbName: "toronto",
-        });
-        console.log("MongoDB connected");
-        // Fetch data from the database
-        const dropResult = {};
-        // Return the object needed 
-        return { dropResult: dropResult };
+        const uri = process.env.MONGO_URI;
+        if (!uri)
+            throw new Error("Missing MONGO_URI in environment variables");
+        await mongoose.connect(uri, { dbName: "toronto" });
+        console.log("✅ MongoDB connected");
+        return { dropResult: {} };
     }
     catch (err) {
-        console.error("MongoDB connection error:", err.message);
-        process.exit(1); // stop the server if DB can't connect
+        console.error("❌ MongoDB connection error:", err.message);
+        process.exit(1);
     }
 }
-export const updateFromToronto = async () => {
-    console.log("updateFromToronto fired");
-    const { APIdropResults, APIlocationResults } = await getTorontoData();
-    // Check if we got a result
-    if (!Array.isArray(APIlocationResults) || !Array.isArray(APIdropResults)) {
-        console.error("No location data received");
-        return;
-    }
-    const updateDBLocation = async () => {
-        try {
-            for (const APIlocationResult of APIlocationResults) {
-                const response = await Location.updateOne({ LocationId: APIlocationResult.LocationID }, {
-                    $set: {
-                        LocationId: APIlocationResult.LocationID,
-                        LocationName: APIlocationResult.LocationName,
-                        LocationType: APIlocationResult.LocationType,
-                        Accessibility: APIlocationResult.Accessibility,
-                        Intersection: APIlocationResult.Intersection,
-                        TTCInformation: APIlocationResult.TTCInformation,
-                        District: APIlocationResult.District,
-                        StreetNo: APIlocationResult.StreetNo,
-                        StreetNoSuffix: APIlocationResult.StreetNoSuffix,
-                        StreetName: APIlocationResult.StreetName,
-                        StreetType: APIlocationResult.StreetType,
-                        StreetDirection: APIlocationResult.StreetDirection,
-                        PostalCode: APIlocationResult.PostalCode,
-                        Description: APIlocationResult.Description,
-                    }
-                }, { upsert: true });
-            }
-        }
-        catch (err) {
-            console.log(err);
-            return (err);
-        }
-    };
-    const updateDBDropIn = async () => {
-        try {
-            for (const APIdropResult of APIdropResults) {
-                // Use a start date and time object instead of hours
-                const { FirstDate, StartHour, StartMinute, LastDate, EndHour, EndMinute } = APIdropResult;
-                const beginDate = dateDataMerge({
-                    date: FirstDate,
-                    hour: StartHour,
-                    minute: StartMinute
-                });
-                const endDate = dateDataMerge({
-                    date: LastDate,
-                    hour: EndHour,
-                    minute: EndMinute
-                });
-                const locationDoc = await Location.findOne({ LocationId: APIdropResult.LocationID });
-                const response = await DropIn.updateOne({ DropInId: APIdropResult.id }, {
-                    $set: {
-                        DropInId: APIdropResult.id,
-                        LocationId: APIdropResult.LocationID,
-                        LocationRef: locationDoc ? locationDoc._id : null,
-                        CourseId: APIdropResult.CourseID,
-                        CourseTitle: APIdropResult.CourseTitle,
-                        Section: APIdropResult.Section,
-                        AgeMin: APIdropResult.AgeMin,
-                        AgeMax: APIdropResult.AgeMax,
-                        BeginDate: beginDate,
-                        EndDate: endDate
-                    }
-                }, { upsert: true });
-            }
-        }
-        catch (err) {
-            console.log(err);
-            return err;
-        }
-    };
-    const response1 = await updateDBLocation();
-    console.log("updateLocation response: ", response1);
-    const response2 = await updateDBDropIn();
-    console.log("updateDropIn response: ", response2);
-    return "Succesfully Updated DB";
-};
+// ---------- Merge Date and Time ----------
 const dateDataMerge = ({ date, hour, minute }) => {
     if (!date) {
         console.error("Missing date:", { date, hour, minute });
         return null;
     }
-    const returnDate = new Date(date);
-    if (isNaN(returnDate.getTime())) {
+    const baseDate = new Date(date);
+    if (isNaN(baseDate.getTime())) {
         console.error("Invalid base date:", date);
         return null;
     }
-    returnDate.setHours(hour ?? 0, minute ?? 0, 0, 0);
-    return returnDate;
+    baseDate.setHours(hour ?? 0, minute ?? 0, 0, 0);
+    return baseDate;
+};
+// ---------- Update DB from Toronto API ----------
+export const updateFromToronto = async () => {
+    console.log("updateFromToronto fired");
+    const { APIdropResults, APIlocationResults } = await getTorontoData();
+    if (!Array.isArray(APIdropResults) || !Array.isArray(APIlocationResults)) {
+        console.error("No valid API data received");
+        return;
+    }
+    // --- Update Locations ---
+    const updateDBLocation = async () => {
+        try {
+            for (const loc of APIlocationResults) {
+                await Location.updateOne({ LocationId: loc.LocationID }, {
+                    $set: {
+                        LocationId: loc.LocationID,
+                        LocationName: loc.LocationName,
+                        LocationType: loc.LocationType,
+                        Accessibility: loc.Accessibility,
+                        Intersection: loc.Intersection,
+                        TTCInformation: loc.TTCInformation,
+                        District: loc.District,
+                        StreetNo: loc.StreetNo,
+                        StreetNoSuffix: loc.StreetNoSuffix,
+                        StreetName: loc.StreetName,
+                        StreetType: loc.StreetType,
+                        StreetDirection: loc.StreetDirection,
+                        PostalCode: loc.PostalCode,
+                        Description: loc.Description,
+                    },
+                }, { upsert: true });
+            }
+        }
+        catch (err) {
+            console.error("Error updating locations:", err);
+            throw err;
+        }
+    };
+    // --- Update DropIns ---
+    const updateDBDropIn = async () => {
+        try {
+            for (const drop of APIdropResults) {
+                const beginDate = dateDataMerge({
+                    date: drop.FirstDate,
+                    hour: drop.StartHour,
+                    minute: drop.StartMinute,
+                });
+                const endDate = dateDataMerge({
+                    date: drop.LastDate,
+                    hour: drop.EndHour,
+                    minute: drop.EndMinute,
+                });
+                const locationDoc = await Location.findOne({ LocationId: drop.LocationID });
+                await DropIn.updateOne({ DropInId: drop.id }, {
+                    $set: {
+                        DropInId: drop.id,
+                        LocationId: drop.LocationID,
+                        LocationRef: locationDoc ? locationDoc._id : null,
+                        CourseId: drop.CourseID,
+                        CourseTitle: drop.CourseTitle,
+                        Section: drop.Section,
+                        AgeMin: drop.AgeMin,
+                        AgeMax: drop.AgeMax,
+                        BeginDate: beginDate,
+                        EndDate: endDate,
+                    },
+                }, { upsert: true });
+            }
+        }
+        catch (err) {
+            console.error("Error updating drop-ins:", err);
+            throw err;
+        }
+    };
+    await updateDBLocation();
+    console.log("✅ Locations updated");
+    await updateDBDropIn();
+    console.log("✅ Drop-ins updated");
+    return "Successfully updated DB";
 };

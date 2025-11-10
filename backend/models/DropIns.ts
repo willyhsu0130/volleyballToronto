@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const docTransform = (doc, ret) => {
+const docTransform = (doc: mongoose.Document, ret: Record<string, any>) => {
   // ret = plain JS object representation of the doc
 
   // flatten location info if it’s populated
@@ -14,6 +14,28 @@ const docTransform = (doc, ret) => {
 
   return ret;
 }
+
+
+export interface IDropIn extends Document {
+  DropInId: number;
+  LocationId: number;
+  LocationRef?: mongoose.Types.ObjectId | {
+    LocationName?: string;
+    District?: string;
+    StreetName?: string;
+    StreetType?: string;
+  };
+  CourseId: number;
+  CourseTitle: string;
+  Section?: string;
+  AgeMin?: number;
+  AgeMax?: number;
+  BeginDate?: Date;
+  EndDate?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 
 const dropInSchema = new mongoose.Schema({
   DropInId: { type: Number, required: true, unique: true },               // Unique row ID from Open Data

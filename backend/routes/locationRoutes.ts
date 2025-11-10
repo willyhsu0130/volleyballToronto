@@ -3,7 +3,7 @@ import {
     getLocationsList,
     getLocationById
 }
-    from "../controllers/locationController.ts";
+    from "../controllers/locationController";
 
 const router = express.Router();
 

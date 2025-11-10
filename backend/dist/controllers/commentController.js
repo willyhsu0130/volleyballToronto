@@ -6,7 +6,7 @@ export const getCommentsByDropIn = async (req, res, next) => {
         if (!dropInId) {
             return res.status(400).json({ error: "Drop In ID is required" });
         }
-        const commentResults = await getCommentsByDropInId({ dropInId });
+        const commentResults = await getCommentsByDropInId({ dropInId: Number(dropInId) });
         if (!commentResults || commentResults.length === 0) {
             return res.status(404).json({ error: "No comments found" });
         }

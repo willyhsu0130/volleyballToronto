@@ -2,7 +2,7 @@
 import { Location } from "../models/Location.js";
 
 
-export const getLocations = async ({ q, nameOnly }) => {
+export const getLocations = async ({ q, nameOnly }: { q: string | undefined, nameOnly: boolean }) => {
     // Build filter object
     const filter = q
         ? { LocationName: { $regex: q, $options: "i" } } // case-insensitive search
@@ -23,7 +23,7 @@ export const getLocations = async ({ q, nameOnly }) => {
 };
 
 
-export const getLocation = async ({ locationId }) => {
+export const getLocation = async ({ locationId }: { locationId: number }) => {
     // Build filter object
 
     let results = Location.findOne(

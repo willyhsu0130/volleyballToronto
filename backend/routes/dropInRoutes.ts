@@ -3,7 +3,7 @@ import {
     getDropIns,
     getDropInById
 }
-    from "../controllers/dropInController.ts";
+    from "../controllers/dropInController";
 
 const router = express.Router();
 

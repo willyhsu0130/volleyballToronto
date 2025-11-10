@@ -2,19 +2,27 @@ import { Request, Response, NextFunction } from "express";
 import { getLocations, getLocation } from "../services/locationService.js";
 
 // GET /locations
-export const getLocationsList = async (req: Request, res: Response, next: NextFunction) => {
+export const getLocationsList = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const { q, nameOnly } = req.query;
 
+    // ensure q is a string
+    const queryString = typeof q === "string" ? q.trim() : undefined;
+    const nameFlag = nameOnly === "true";
+
     const results = await getLocations({
-      q,
-      name: nameOnly === "true"
+      q: queryString,
+      nameOnly: nameFlag,
     });
 
-    return res.status(200).json(results);
+    res.status(200).json(results);
   } catch (error) {
     console.error("Error fetching locations list:", error);
-    next(error); // send to global error handler
+    next(error);
   }
 };
 
@@ -28,7 +36,7 @@ export const getLocationById = async (req: Request, res: Response, next: NextFun
       return res.status(400).json({ error: "Community Center ID is required" });
     }
 
-    const result = await getLocation({ locationId });
+    const result = await getLocation({ locationId: Number(locationId) });
 
     if (!result) {
       return res.status(404).json({ error: "Community center not found" });

@@ -1,73 +1,86 @@
-import { getSportFromDB, getDropInById as DBgetDropInById } from "../services/dropInService.js";
-// Utility: escape special characters to prevent regex injection
+import { getSportFromDB, getDropInById as DBgetDropInById } from "../services/dropInService";
+// Utility: escape special characters (useful for string filters)
 const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 export const getDropIns = async (req, res, next) => {
     try {
         const { sports, beginDate, endDate, locationId, age } = req.query;
+        // --- sports ---
         let sportsArray = [];
         if (typeof sports === "string" && sports.trim().length > 0) {
-            sportsArray = sports.split(",").map(s => s.trim()).filter(Boolean);
+            sportsArray = sports.split(",").map((s) => s.trim()).filter(Boolean);
         }
-        // -------- Validation --------
+        // --- dates ---
         let parsedBeginDate = null;
         let parsedEndDate = null;
         if (beginDate) {
             const d = new Date(beginDate);
             if (isNaN(d.getTime())) {
-                return res.status(400).json({ error: "Invalid beginDate" });
+                res.status(400).json({ error: "Invalid beginDate" });
+                return;
             }
-            parsedBeginDate = d.toISOString();
+            parsedBeginDate = d;
         }
         if (endDate) {
             const d = new Date(endDate);
             if (isNaN(d.getTime())) {
-                return res.status(400).json({ error: "Invalid endDate" });
+                res.status(400).json({ error: "Invalid endDate" });
+                return;
             }
-            parsedEndDate = d.toISOString();
+            parsedEndDate = d;
         }
+        // --- age ---
+        let parsedAge = null;
         if (age) {
-            const parsedAge = Number(age);
-            if (isNaN(parsedAge)) {
-                return res.status(400).json({ error: "Age must be a number" });
+            const num = Number(age);
+            if (isNaN(num)) {
+                res.status(400).json({ error: "Age must be a number" });
+                return;
             }
+            parsedAge = num;
         }
+        // --- location ---
         let safeLocation = null;
         if (locationId) {
             const parsedLocationId = Number(locationId);
             if (isNaN(parsedLocationId)) {
-                return res.status(400).json({ error: "Location ID must be a number" });
+                res.status(400).json({ error: "Location ID must be a number" });
+                return;
             }
-            safeLocation = escapeRegex(locationId);
+            safeLocation = parsedLocationId;
         }
-        // -------- Database call --------
+        // --- Query DB ---
         const results = await getSportFromDB({
             sports: sportsArray,
             beginDate: parsedBeginDate,
             endDate: parsedEndDate,
             locationId: safeLocation,
-            age
+            age: parsedAge,
         });
-        return res.status(200).json(results);
+        res.status(200).json(results);
     }
     catch (err) {
-        console.error("Error in getTimes controller:", err);
-        next(err); // pass error to global handler
+        console.error("Error in getDropIns controller:", err);
+        next(err);
     }
 };
+// ---------------------------
 export const getDropInById = async (req, res, next) => {
     try {
         const { dropInId } = req.params;
-        if (!dropInId) {
-            return res.status(400).json({ error: "Drop In ID is required" });
+        const idNum = Number(dropInId);
+        if (!dropInId || isNaN(idNum)) {
+            res.status(400).json({ error: "Valid DropIn ID is required" });
+            return;
         }
-        const dropInResults = await DBgetDropInById({ dropInId });
+        const dropInResults = await DBgetDropInById({ dropInId: idNum });
         if (!dropInResults) {
-            return res.status(404).json({ error: "Drop In not found" });
+            res.status(404).json({ error: "DropIn not found" });
+            return;
         }
-        return res.status(200).json(dropInResults);
+        res.status(200).json(dropInResults);
     }
     catch (error) {
         console.error("Error fetching drop-in:", error);
-        next(error); // Pass to global error handler
+        next(error);
     }
 };

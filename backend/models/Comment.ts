@@ -1,5 +1,11 @@
 import mongoose from "mongoose";
 
+export type CommentType = {
+  DropInId: number
+  UserId: number
+  Content: string
+}
+
 const commentSchema = new mongoose.Schema(
   {
     DropInId: {

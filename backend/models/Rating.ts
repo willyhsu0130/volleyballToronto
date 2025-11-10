@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 const ratingSchema = new mongoose.Schema({
   dropIn: { type: mongoose.Schema.Types.ObjectId, ref: "DropIn", required: true },
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
