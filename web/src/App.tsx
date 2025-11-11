@@ -1,13 +1,13 @@
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from "react-router-dom";
-import { DropInsProvider } from "./context/DropInContext.tsx";
-import { FilterProvider } from "./context/FiltersContext.tsx"
+import { DropInsProvider } from "./context/DropInContext";
+import { FilterProvider } from "./context/FiltersContext"
 import { useState } from "react";
-import DropIns from "./pages/DropIns.tsx";
-import Locations from "./pages/Locations.tsx";
-import CommunityCenter from "./pages/CommunityCenter.tsx";
-import DropInProgram from "./pages/DropInProgram.tsx";
-import Login from "./pages/(auth)/Login.tsx";
-import Signup from "./pages/(auth)/SignUp.tsx";
+import DropIns from "./pages/DropIns";
+import Locations from "./pages/Locations";
+import CommunityCenter from "./pages/CommunityCenter";
+import DropInProgram from "./pages/DropInProgram";
+import Login from "./pages/(auth)/Login";
+import Signup from "./pages/(auth)/SignUp";
 
 const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API || "localhost:3000";
 

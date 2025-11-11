@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useDropIns } from "../context/DropInContext.tsx";
+import { useDropIns } from "../context/DropInContext";
 import { ThumbsUp } from "lucide-react"
 
 

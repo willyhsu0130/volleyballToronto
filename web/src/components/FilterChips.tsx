@@ -1,4 +1,4 @@
-import { FilterState, useFilters } from "../context/FiltersContext.tsx";
+import { FilterState, useFilters } from "../context/FiltersContext";
 
 interface FilterChipsProps {
     className: string
@@ -23,7 +23,6 @@ export const FilterChips = ({ className, handleRemoveFilter }: FilterChipsProps)
                 sports.map((item, index) => (
                     <FilterChip
                         key={index}
-                        filterKey={index}
                         filterValue={item}
                         handleRemoveFilter={() => handleRemoveFilter(item)} />
                 ))}
@@ -36,8 +35,6 @@ interface FilterChipProps {
     filterValue: String
     handleRemoveFilter: () => void
 }
-
-
 
 const FilterChip = ({ filterValue, handleRemoveFilter }: FilterChipProps) => {
 

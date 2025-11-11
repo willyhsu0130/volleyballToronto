@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react"
 import { useParams } from "react-router-dom"
-import { ResultCards } from "../components/ResultCards.tsx"
-import { CalendarSchedule } from "../components/CalendarSchedule.tsx"
-import { GoogleMapsEmbed } from "../components/GoogleMaps.tsx"
-import { useFilters } from "../context/FiltersContext.tsx"
-import { useDropIns } from "../context/DropInContext.tsx"
+import { ResultCards } from "../components/ResultCards"
+import { CalendarSchedule } from "../components/CalendarSchedule"
+import { GoogleMapsEmbed } from "../components/GoogleMaps"
+import { useFilters } from "../context/FiltersContext"
+import { useDropIns } from "../context/DropInContext"
 
 const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API
 

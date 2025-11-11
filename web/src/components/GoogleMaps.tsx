@@ -1,10 +1,10 @@
 import { APIProvider, Map, Marker } from "@vis.gl/react-google-maps";
 import { useEffect, useState } from "react";
 
-const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY || "";
 
-export const GoogleMaps = ({ address, className }) => {
-  const [coords, setCoords] = useState(null);
+export const GoogleMaps = ({ address, className }: { address: string, className: string }) => {
+  const [coords, setCoords] = useState<{ lat: any, lng: any } | null>(null);
   // Get coordinates using address
   useEffect(() => {
     if (!address) return;
@@ -39,7 +39,7 @@ export const GoogleMaps = ({ address, className }) => {
   );
 };
 
-async function getCoordinatesFromAddress({ address }) {
+async function getCoordinatesFromAddress({ address }: { address: string }) {
   try {
     const response = await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
@@ -54,22 +54,22 @@ async function getCoordinatesFromAddress({ address }) {
       return { lat, lng };
     } else {
       console.error("Geocoding error:", data.status);
-      return null;
+      return { lat: null, lng: null };
     }
   } catch (err) {
     console.error("Error fetching geocode:", err);
-    return null;
+    return { lat: null, lng: null };;
   }
 }
 
-export const GoogleMapsEmbed = ({ address, className }) => {
+export const GoogleMapsEmbed = ({ address, className }: { address: string, className: string }) => {
   const mapUrl = `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`;
 
   return (
     <div className={`${className}`}>
       <iframe
-      className="h-full"
-      title="GoogleMapsEmbed"
+        className="h-full"
+        title="GoogleMapsEmbed"
         src={mapUrl}
         width="100%"
         height="100%"

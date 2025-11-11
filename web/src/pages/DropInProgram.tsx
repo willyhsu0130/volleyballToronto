@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom"
-import { useDropIns, DropIn } from "../context/DropInContext.tsx"
-import { Comments, CommentType } from "../components/Comments.tsx";
+import { useDropIns, DropIn } from "../context/DropInContext"
+import { Comments, CommentType } from "../components/Comments";
 
 const DropInProgram = () => {
 

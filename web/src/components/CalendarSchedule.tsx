@@ -1,4 +1,4 @@
-export const CalendarSchedule = ({ className }) => {
+export const CalendarSchedule = ({ className }: { className: string }) => {
 
   return (
     <div className={`${className}`}>

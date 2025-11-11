@@ -1,5 +1,5 @@
 import { useState, ChangeEvent } from "react"
-import { signup } from "../../context/Fetchers.ts"
+import { signup } from "../../services/fetchers"
 
 const Signup = () => {
     const [username, setUsername] = useState<string>("willyhsu0130")

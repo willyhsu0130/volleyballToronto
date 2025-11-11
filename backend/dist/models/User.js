@@ -28,8 +28,11 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 // Pre-save hook — hash with salt automatically
 userSchema.pre("save", async function (next) {
-    if (!this.isModified("password"))
+    console.log("Hook running");
+    if (!this.isModified("Password")) {
+        console.log("password not modfied");
         return next();
+    }
     const salt = await bcrypt.genSalt(SALT_ROUNDS);
     this.Password = await bcrypt.hash(this.Password, salt);
     next();

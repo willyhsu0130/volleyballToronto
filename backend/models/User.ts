@@ -1,9 +1,22 @@
-import mongoose from "mongoose";
+import mongoose, { Document, Model } from "mongoose";
 import bcrypt from "bcrypt";
 
 const SALT_ROUNDS = 12; // safe default for modern CPUs
 
-const userSchema = new mongoose.Schema(
+export interface IUser {
+  Username: string;
+  Email: string;
+  Password: string;
+  Role: "user" | "admin";
+}
+
+export interface IUserMethods {
+  comparePassword(candidatePassword: string): Promise<boolean>;
+}
+
+export type UserDocument = Document & IUser & IUserMethods;
+
+const userSchema = new mongoose.Schema<IUser, Model<IUser, {}, IUserMethods>, IUserMethods>(
   {
     Username: {
       type: String,
@@ -34,7 +47,11 @@ const userSchema = new mongoose.Schema(
 
 // Pre-save hook — hash with salt automatically
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+  console.log("Hook running")
+  if (!this.isModified("Password")) {
+    console.log("password not modfied")
+    return next();
+  }
 
   const salt = await bcrypt.genSalt(SALT_ROUNDS);
   this.Password = await bcrypt.hash(this.Password, salt);

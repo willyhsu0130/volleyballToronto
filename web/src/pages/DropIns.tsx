@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { ResultCards } from "../components/ResultCards.tsx";
-import { CalendarSchedule } from "../components/CalendarSchedule.tsx";
-import { FilterChips } from "../components/FilterChips.tsx"
-import { useFilters } from "../context/FiltersContext.tsx";
+import { ResultCards } from "../components/ResultCards";
+import { CalendarSchedule } from "../components/CalendarSchedule";
+import { FilterChips } from "../components/FilterChips"
+import { useFilters } from "../context/FiltersContext";
 
 const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API;
 

@@ -101,3 +101,31 @@ export const signup = async ({
     }
 
 }
+
+export const login = async ({ username, password }: { username: string, password: string }) => {
+    try {
+        if (!username || typeof username !== "string") throw new Error("username is required to signup")
+        // Check if the dropInId, userId, text is valid.
+
+        if (!password || typeof password !== "string") throw new Error("password is required to signup")
+
+        const res = await fetch(`${SERVER_API}auth/login`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+        })
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.message || "Login failed");
+        }
+        return res.json()
+    } catch (error) {
+        console.log(error)
+        return error
+    }
+}

@@ -1,6 +1,6 @@
- "react";
+"react";
 import { Link } from "react-router-dom";
-import { useDropIns, DropIn } from "../context/DropInContext.tsx";
+import { useDropIns, DropIn } from "../context/DropInContext";
 
 
 interface ResultCardProps {

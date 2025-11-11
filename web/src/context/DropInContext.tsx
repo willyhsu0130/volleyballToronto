@@ -6,9 +6,9 @@ import {
     ReactNode
 } from "react"
 
-import { useFilters } from "./FiltersContext.tsx";
+import { useFilters } from "./FiltersContext";
 
-import { CommentType } from "../components/Comments.tsx";
+import { CommentType } from "../components/Comments";
 
 export interface DropIn {
     DropInId: number;        // Unique row ID from Open Data
