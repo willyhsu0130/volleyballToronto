@@ -9,7 +9,7 @@ import DropInProgram from "./pages/DropInProgram";
 import Login from "./pages/(auth)/Login";
 import Signup from "./pages/(auth)/SignUp";
 import { ErrorBoundary } from "react-error-boundary";
-import { ErrorFallBack } from "./components/errors/ErrorFallBack"
+import { ErrorScreen} from "./components/errors/ErrorFallBack"
 import { AuthProvider } from "./context/AuthContext";
 
 const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API || "localhost:3000";
@@ -70,7 +70,7 @@ export default function App() {
 
         {/* Main content */}
         <ErrorBoundary
-          FallbackComponent={ErrorFallBack}
+          FallbackComponent={ErrorScreen}
           onReset={() => {
             // You can reset any state or navigation here
             window.location.reload();
