@@ -9,7 +9,7 @@ import DropInProgram from "./pages/DropInProgram";
 import Login from "./pages/(auth)/Login";
 import Signup from "./pages/(auth)/SignUp";
 import { ErrorBoundary } from "react-error-boundary";
-import ErrorFallBack from "./components/errors/ErrorFallBack"
+import { ErrorFallBack } from "./components/errors/ErrorFallBack"
 import { AuthProvider } from "./context/AuthContext";
 
 const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API || "localhost:3000";

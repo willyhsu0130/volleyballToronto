@@ -3,7 +3,7 @@ type ErrorFallbackProps = {
     resetErrorBoundary: () => void;
 };
 
-const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
+export const ErrorFallBack = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-red-50 to-red-100 text-red-800">
             <div className="bg-white shadow-lg rounded-2xl p-8 max-w-md text-center border border-red-200">
@@ -20,5 +20,3 @@ const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
         </div>
     );
 };
-
-export default ErrorFallback

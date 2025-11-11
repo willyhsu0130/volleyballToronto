@@ -126,10 +126,10 @@ export const signup = async ({
 
 export const login = async ({ username, password }: { username: string, password: string }) => {
     try {
-        if (!username || typeof username !== "string") throw new Error("username is required to signup")
+        if (!username || typeof username !== "string") throw new Error("Username is required to signup.")
         // Check if the dropInId, userId, text is valid.
 
-        if (!password || typeof password !== "string") throw new Error("password is required to signup")
+        if (!password || typeof password !== "string") throw new Error("Password is required to signup")
 
         const res = await fetch(`${SERVER_API}auth/login`, {
             method: "POST",
