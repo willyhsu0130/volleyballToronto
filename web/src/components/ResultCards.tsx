@@ -10,7 +10,6 @@ interface ResultCardProps {
 }
 const ResultCard = ({ item, linkToLocation }: ResultCardProps) => {
 
-
   if (!item.BeginDate || !item.EndDate) return null;
 
   const begin = new Date(item.BeginDate);

@@ -8,6 +8,9 @@ import CommunityCenter from "./pages/CommunityCenter";
 import DropInProgram from "./pages/DropInProgram";
 import Login from "./pages/(auth)/Login";
 import Signup from "./pages/(auth)/SignUp";
+import { ErrorBoundary } from "react-error-boundary";
+import ErrorFallBack from "./components/errors/ErrorFallBack"
+import { AuthProvider } from "./context/AuthContext";
 
 const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API || "localhost:3000";
 
@@ -66,21 +69,31 @@ export default function App() {
         </div>
 
         {/* Main content */}
-        <FilterProvider>
-          <DropInsProvider>
-            <div className="h-[92%] flex-1 w-full">
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/dropins" element={<DropIns />} />
-                <Route path="/locations" element={<Locations />} />
-                <Route path="/locations/:communityCenterId" element={<CommunityCenter />} />
-                <Route path="/dropins/:dropInId" element={<DropInProgram />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-              </Routes>
-            </div>
-          </DropInsProvider>
-        </FilterProvider>
+        <ErrorBoundary
+          FallbackComponent={ErrorFallBack}
+          onReset={() => {
+            // You can reset any state or navigation here
+            window.location.reload();
+          }}
+        >
+          <AuthProvider>
+            <FilterProvider>
+              <DropInsProvider>
+                <div className="h-[92%] flex-1 w-full">
+                  <Routes>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/dropins" element={<DropIns />} />
+                    <Route path="/locations" element={<Locations />} />
+                    <Route path="/locations/:communityCenterId" element={<CommunityCenter />} />
+                    <Route path="/dropins/:dropInId" element={<DropInProgram />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Signup />} />
+                  </Routes>
+                </div>
+              </DropInsProvider>
+            </FilterProvider>
+          </AuthProvider>
+        </ErrorBoundary>
       </Router>
     </div>
   );

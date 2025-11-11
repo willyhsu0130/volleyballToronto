@@ -12,15 +12,15 @@ type signupType = {
 
 export const signUp = async ({ username, email, password }: signupType) => {
     console.log("signedUp service called")
-    const existing = await User.findOne({ Email: email });
+    const existing = await User.findOne({ email: email });
     console.log(existing)
     if (existing) throw new AppError("Email already in use", 409);
 
     // Hashing
     const newUser = new User({
-        Username: username,
-        Email: email,
-        Password: password
+        username: username,
+        email: email,
+        password: password
     })
     console.log(newUser)
     const signUpResults = await newUser.save()
@@ -36,8 +36,8 @@ type signinType = {
     password: string
 }
 
-export const login = async ({ username, password }: signinType) => {
-    const user = await User.findOne({ Username: username }).select("+Password");
+export const login = async ({ username, password}: signinType) => {
+    const user = await User.findOne({ username: username }).select("+password");
     if (!user) {
         throw new AppError("Username not found", 401);
     }
@@ -48,16 +48,16 @@ export const login = async ({ username, password }: signinType) => {
         throw new AppError("Invalid credentials", 401);
     }
 
-    const { Password, ...userWithoutPassword } = user.toObject();
+    const { password: _, ...userWithoutPassword } = user.toObject();
 
-    // optional JWT
-    const token = jwt.sign(
-        { id: user._id, username: user.Username, role: user.Role },
-        process.env.JWT_SECRET || "dev-secret",
-        { expiresIn: "1d" }
-    );
+  // optional JWT
+  const token = jwt.sign(
+    { id: user._id, username: user.username, role: user.role },
+    process.env.JWT_SECRET || "dev-secret",
+    { expiresIn: "1d" }
+  );
 
-    // return the safe user (no Password)
-    return { token, user: userWithoutPassword };
+  // return the safe user (no Password)
+  return { token, user: userWithoutPassword };
 
 }

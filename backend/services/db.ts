@@ -58,11 +58,11 @@ export async function connectDB(): Promise<{ dropResult: Record<string, never> }
     if (!uri) throw new Error("Missing MONGO_URI in environment variables");
 
     await mongoose.connect(uri, { dbName: "toronto" });
-    console.log("✅ MongoDB connected");
+    console.log("MongoDB connected");
 
     return { dropResult: {} };
   } catch (err: any) {
-    console.error("❌ MongoDB connection error:", err.message);
+    console.error("MongoDB connection error:", err.message);
     process.exit(1);
   }
 }

@@ -7,7 +7,7 @@ import {
 } from "react"
 
 import { useFilters } from "./FiltersContext";
-
+import { useAuth } from "./AuthContext"
 import { CommentType } from "../components/Comments";
 
 export interface DropIn {
@@ -39,16 +39,9 @@ interface DropInsContextType {
         email: string
         password: string
     }) => void
-    submitComment: (comment: {
-        DropInId: number
-        UserId: number
-        Content: string
-    }) => void
 }
 
-
 const SERVER_API = process.env.REACT_APP_SERVER_API;
-
 
 const DropInsContext = createContext<DropInsContextType | undefined>(undefined);
 
@@ -115,47 +108,7 @@ export const DropInsProvider = ({ children }: { children: ReactNode }) => {
             console.error("Error:", error)
         }
     }
-    const submitComment = async ({
-        DropInId,
-        UserId,
-        Content
-    }: {
-        DropInId: number
-        UserId: number
-        Content: string
-    }) => {
-        console.log("submit commenting")
-        console.log("Content", Content)
-        try {
-            if (!UserId) throw new Error("userId is required to comment!")
-            // Check if the dropInId, userId, text is valid.
-
-            if (!Content || typeof Content !== "string") throw new Error("Comment must contain any texts")
-            Content = Content.trim()
-
-            if (!DropInId) throw new Error("Error with dropInId")
-
-            const res = await fetch(`${SERVER_API}comments`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    Content: Content,
-                    DropInId: DropInId,
-                    UserId: UserId
-                })
-            })
-            if (!res.ok) throw new Error("Error commenting")
-            const updated = await fetchDropInById(DropInId);
-            return updated;
-
-        } catch (error) {
-            console.log(error)
-            return error
-        }
-
-    }
+   
     const signup = async ({
         username,
         email,
@@ -199,7 +152,6 @@ export const DropInsProvider = ({ children }: { children: ReactNode }) => {
             loading,
             setLoading,
             fetchDropInById,
-            submitComment,
             fetchCommentsByDropInId,
             signup
         }}>

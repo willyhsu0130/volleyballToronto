@@ -12,7 +12,7 @@ const startServer = async () => {
         const { dropResult } = await connectDB(); // Connect to MongoDB
         console.log("Database connected:", !!dropResult);
         app.listen(PORT, "0.0.0.0", () => {
-            console.log(`🚀 Server running at http://localhost:${PORT}`);
+            console.log(`Server running at http://localhost:${PORT}`);
         });
     }
     catch (err) {

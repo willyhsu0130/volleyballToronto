@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import { useDropIns } from "../context/DropInContext";
 import { ThumbsUp } from "lucide-react"
-
-
+import { useAuth } from "../context/AuthContext";
+import { submitComment } from "../services/fetchers";
 export interface CommentType {
     _id?: string;
     DropInId: number;
@@ -24,14 +23,13 @@ export const Comments = ({ comments, dropInId }: CommentsProps) => {
     const userId = 1; // temporary
     const [commentField, setCommentField] = useState("");
     const [localComments, setLocalComments] = useState(comments ?? []);
+    const { token } = useAuth()
 
     useEffect(() => {
         if (comments) {
             setLocalComments(comments);
         }
     }, [comments]);
-
-    const { submitComment } = useDropIns();
 
     const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => setCommentField(e.target.value);
 
@@ -49,7 +47,7 @@ export const Comments = ({ comments, dropInId }: CommentsProps) => {
         setCommentField("");
 
         try {
-            submitComment(tempComment)
+            submitComment({ tempComment, token })
         } catch (error) {
             console.log(error)
         }

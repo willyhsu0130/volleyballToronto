@@ -1,5 +1,22 @@
 const SERVER_API = process.env.REACT_APP_SERVER_API;
 
+interface ApiResponse<T> {
+    success: boolean;
+    message?: string;
+    data?: T;
+}
+
+interface LoginData {
+    token: string;
+    user: {
+        _id: string;
+        username: string;
+        email: string;
+        role: "user" | "admin";
+    };
+}
+
+
 export const fetchDropInById = async (dropInId: number) => {
     try {
         // Fetch dropInData
@@ -22,17 +39,19 @@ export const fetchCommentsByDropInId = async (dropInId: number) => {
         console.error("Error:", error)
     }
 }
-export const submitComment = async ({
-    DropInId,
-    UserId,
-    Content
-}: {
-    DropInId: number
-    UserId: number
-    Content: string
-}) => {
-    console.log("submit commenting")
-    console.log("Content", Content)
+interface ISubmitComment {
+    tempComment: {
+        DropInId: number
+        UserId: number
+        Content: string
+    },
+    token: string | null
+}
+
+export const submitComment = async ({ tempComment, token }: ISubmitComment) => {
+    let { DropInId, UserId, Content } = tempComment
+    console.log("token is: ", token)
+    console.log(Content, token, "submit commment")
     try {
         if (!UserId) throw new Error("userId is required to comment!")
         // Check if the dropInId, userId, text is valid.
@@ -46,6 +65,7 @@ export const submitComment = async ({
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify({
                 Content: Content,
@@ -55,12 +75,14 @@ export const submitComment = async ({
         })
         console.log(res)
         if (!res.ok) throw new Error("Error commenting")
-        const updated = await fetchDropInById(DropInId);
-        return updated;
+        return {
+            success: true,
+            data: res
+        }
 
-    } catch (error) {
+    } catch (error: any) {
         console.log(error)
-        return error
+        return { success: false, message: error.message || "Error submitting comment" };
     }
 
 }
@@ -123,9 +145,15 @@ export const login = async ({ username, password }: { username: string, password
             const err = await res.json();
             throw new Error(err.message || "Login failed");
         }
-        return res.json()
-    } catch (error) {
-        console.log(error)
-        return error
+        const json = await res.json()
+        return {
+            success: true,
+            data: json as LoginData
+        }
+    } catch (error: any) {
+        return {
+            success: false,
+            message: error.message
+        }
     }
 }
