@@ -1,4 +1,6 @@
 import { getSportFromDB, getDropInById as DBgetDropInById } from "../services/dropInService.js";
+import { AppError } from "../utils/classes.js";
+import { sendSuccess } from "../utils/helpers.js";
 // Utility: escape special characters (useful for string filters)
 const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 export const getDropIns = async (req, res, next) => {
@@ -14,38 +16,30 @@ export const getDropIns = async (req, res, next) => {
         let parsedEndDate = null;
         if (beginDate) {
             const d = new Date(beginDate);
-            if (isNaN(d.getTime())) {
-                res.status(400).json({ error: "Invalid beginDate" });
-                return;
-            }
+            if (isNaN(d.getTime()))
+                new AppError("Invalid beginDate", 400);
             parsedBeginDate = d;
         }
         if (endDate) {
             const d = new Date(endDate);
-            if (isNaN(d.getTime())) {
-                res.status(400).json({ error: "Invalid endDate" });
-                return;
-            }
+            if (isNaN(d.getTime()))
+                new AppError("Invalid endDate", 400);
             parsedEndDate = d;
         }
         // --- age ---
         let parsedAge = null;
         if (age) {
             const num = Number(age);
-            if (isNaN(num)) {
-                res.status(400).json({ error: "Age must be a number" });
-                return;
-            }
+            if (isNaN(num))
+                new AppError("Age must be a number", 400);
             parsedAge = num;
         }
         // --- location ---
         let safeLocation = null;
         if (locationId) {
             const parsedLocationId = Number(locationId);
-            if (isNaN(parsedLocationId)) {
-                res.status(400).json({ error: "Location ID must be a number" });
-                return;
-            }
+            if (isNaN(parsedLocationId))
+                new AppError("LocationId must be a number", 400);
             safeLocation = parsedLocationId;
         }
         // --- Query DB ---
@@ -56,31 +50,20 @@ export const getDropIns = async (req, res, next) => {
             locationId: safeLocation,
             age: parsedAge,
         });
-        res.status(200).json(results);
+        sendSuccess(res, "DropIns Fetched", 200, results);
     }
     catch (err) {
-        console.error("Error in getDropIns controller:", err);
         next(err);
     }
 };
 // ---------------------------
 export const getDropInById = async (req, res, next) => {
-    try {
-        const { dropInId } = req.params;
-        const idNum = Number(dropInId);
-        if (!dropInId || isNaN(idNum)) {
-            res.status(400).json({ error: "Valid DropIn ID is required" });
-            return;
-        }
-        const dropInResults = await DBgetDropInById({ dropInId: idNum });
-        if (!dropInResults) {
-            res.status(404).json({ error: "DropIn not found" });
-            return;
-        }
-        res.status(200).json(dropInResults);
-    }
-    catch (error) {
-        console.error("Error fetching drop-in:", error);
-        next(error);
-    }
+    const { dropInId } = req.params;
+    const idNum = Number(dropInId);
+    if (!dropInId || isNaN(idNum))
+        throw new AppError("DropInId not valid", 400);
+    const dropInResults = await DBgetDropInById({ dropInId: idNum });
+    if (!dropInResults)
+        throw new AppError("DropIn not found", 404);
+    sendSuccess(res, "DropIn Found", 203, dropInResults);
 };

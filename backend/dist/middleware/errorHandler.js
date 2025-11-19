@@ -1,4 +1,4 @@
-import { AppError } from "../utils/AppError.js";
+import { AppError } from "../utils/classes.js";
 export const errorHandler = (err, req, res, next) => {
     console.error("Error stack:", err.stack);
     if (err instanceof AppError) {
