@@ -83,7 +83,7 @@ const safeFetch = async <T>(
 // =====================================================
 
 export const fetchDropIns = async (
-   query: string,
+    query: string,
 ): Promise<ApiResponse<DropIn[] | []>> => {
     const url = `${SERVER_API}dropIns${query ? `?${query}` : ""}`;
     return safeFetch<any>(url);
@@ -153,6 +153,36 @@ export const submitComment = async ({
 
 
 
+
+// =====================================================
+// Toggle Comment Likes
+// ====================================================
+
+interface ToggleLikeInput {
+    commentId: string;
+    token: string | null;
+}
+
+export const toggleCommentLike = async ({
+    commentId,
+    token
+}: ToggleLikeInput): Promise<ApiResponse<any>> => {
+    try {
+        if (!token) throw new Error("Missing token. User must login before liking.");
+        if (!commentId) throw new Error("Missing comment ID");
+
+        return safeFetch<any>(`${SERVER_API}comments/${commentId}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ commentId })
+        });
+    } catch (err: any) {
+        return { success: false, message: err.message };
+    }
+};
 
 
 // =====================================================

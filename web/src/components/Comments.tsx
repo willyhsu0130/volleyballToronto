@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ThumbsUp } from "lucide-react"
 import { useAuth } from "../context/AuthContext";
-import { submitComment } from "../services/fetchers";
+import { submitComment, toggleCommentLike } from "../services/fetchers";
 import { KnownError } from "./classes/ErrorClass";
 import { useThrowAsyncError } from "../hooks/useThrowAsyncError"
 
@@ -12,7 +12,8 @@ export interface CommentType {
     DropInId: number;
     UserId: string;
     Content: string;
-    Likes?: any[];
+    LikesCount: number
+    LikedByUser: boolean
     createdAt?: string;
     updatedAt?: string;
     __v?: number;
@@ -46,7 +47,9 @@ export const Comments = ({ comments, dropInId }: CommentsProps) => {
             DropInId: dropInId,
             UserId: user?._id,
             Content: commentField.trim(),
-            Username: user?.username
+            Username: user?.username,
+            LikesCount: 0,
+            LikedByUser: false,
         }
         const submitResults = await submitComment({
             comment: {
@@ -99,6 +102,28 @@ export const Comments = ({ comments, dropInId }: CommentsProps) => {
 };
 
 const Comment = ({ item }: { item: CommentType }) => {
+    const [liked, setLiked] = useState(item.LikedByUser)
+    const [likesCount, setLikesCount] = useState(item.LikesCount);
+    const { token } = useAuth();
+
+    const thumbStyle = () => {
+        if (liked) return "blue"
+        return "black"
+    }
+
+    const handleToggleLike = async () => {
+        if (!token) return alert("Please login to like comments");
+
+        const results = await toggleCommentLike({
+            commentId: item._id!,
+            token
+        });
+        setLiked(prev => !prev);
+        setLikesCount(prev => (liked ? prev - 1 : prev + 1));
+        console.log("Toggle Like Response:", results);
+    };
+
+
     return (
         <div className="border-b py-2 flex">
             <div>
@@ -107,10 +132,14 @@ const Comment = ({ item }: { item: CommentType }) => {
             <div>
                 <p>{item.Username}</p>
                 <p>{item.Content}</p>
-                <p>{item.Likes}</p>
                 <div className="flex gap-x-2">
-                    <ThumbsUp size={20} />
-                    <p>{10}</p>
+                    <button
+                        onClick={handleToggleLike}
+                    >
+                        <ThumbsUp size={20} color={liked ? "blue" : "black"} />
+                    </button>
+
+                    <p>{likesCount}</p>
                 </div>
 
             </div>

@@ -1,5 +1,5 @@
 import express from "express";
-import { getCommentsByDropIn, postComment } from "../controllers/commentController.js";
+import { getCommentsByDropIn, postComment, postCommentLike } from "../controllers/commentController.js";
 import { verifyToken } from "../middleware/authMiddleware.js"
 
 const router = express.Router();
@@ -9,5 +9,7 @@ router.get("/:dropInId", getCommentsByDropIn);
 
 // POST /comments
 router.post("/", verifyToken, postComment);
+
+router.post("/:commentId", verifyToken, postCommentLike);
 
 export default router;
