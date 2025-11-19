@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express"
-import { getProfileByUserId } from "../services/profileService";
-import { AppError } from "../utils/classes";
-import { AuthRequest } from "../middleware/authMiddleware";
-import { sendSuccess } from "../utils/helpers";
+import { getProfileByUserId } from "../services/profileService.js";
+import { AppError } from "../utils/classes.js";
+import { AuthRequest } from "../middleware/authMiddleware.js";
+import { sendSuccess } from "../utils/helpers.js";
 
 export const getProfile = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
