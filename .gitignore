@@ -1,3 +1,10 @@
+# Ignore ALL .env files
 .env
+*.env
+**/*.env
+
+# Ignore database files
 db.txt
-**/.env
+
+# Node modules (if not already)
+node_modules/
