@@ -1,6 +1,6 @@
-import { getProfileByUserId } from "../services/profileService";
-import { AppError } from "../utils/classes";
-import { sendSuccess } from "../utils/helpers";
+import { getProfileByUserId } from "../services/profileService.js";
+import { AppError } from "../utils/classes.js";
+import { sendSuccess } from "../utils/helpers.js";
 export const getProfile = async (req, res, next) => {
     try {
         const userId = req.user?.userId;
