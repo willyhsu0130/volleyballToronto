@@ -1,5 +1,7 @@
 import { Comment } from "../models/Comment.js";
-export const getCommentsByDropInId = async ({ DropInId }) => {
+import { AppError } from "../utils/classes.js";
+import mongoose from "mongoose";
+export const getCommentsByDropInId = async ({ DropInId, UserId }) => {
     const comments = await Comment.find({ DropInId })
         .populate("UserId", "username")
         .sort({ createdAt: -1 })
@@ -10,8 +12,10 @@ export const getCommentsByDropInId = async ({ DropInId }) => {
         Content: c.Content,
         createdAt: c.createdAt,
         updatedAt: c.updatedAt,
-        userId: c.UserId?._id?.toString(),
-        username: c.UserId?.username // extracted
+        UserId: c.UserId?._id?.toString(),
+        Username: c.UserId?.username, // extracted
+        LikesCount: c.Likes?.length ?? 0,
+        LikedByUser: c.Likes?.some((id) => id.toString() === UserId) ?? false
     }));
 };
 export const updateComment = async ({ Content, DropInId, UserId }) => {
@@ -22,4 +26,21 @@ export const updateComment = async ({ Content, DropInId, UserId }) => {
     });
     console.log(updateResults);
     return updateResults;
+};
+export const toggleCommentLike = async ({ CommentId, UserId }) => {
+    const comment = await Comment.findById(CommentId);
+    if (!comment)
+        throw new AppError("Comment not found", 404);
+    const hasLiked = comment.Likes.some((id) => id.toString() === UserId);
+    const userObjectId = new mongoose.Types.ObjectId(UserId);
+    if (hasLiked) {
+        // Remove like
+        comment.Likes = comment.Likes.filter((id) => id.toString() !== UserId);
+    }
+    else {
+        // Add like
+        comment.Likes.push(userObjectId);
+    }
+    await comment.save();
+    return comment;
 };

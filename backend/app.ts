@@ -5,6 +5,7 @@ import dropInRoutes from "./routes/dropInRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import locationRoutes from "./routes/locationRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
+import profileRoutes from "./routes/profileRoutes.js"
 import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
@@ -22,6 +23,7 @@ app.use("/dropIns", dropInRoutes);
 app.use("/locations", locationRoutes);
 app.use("/auth", authRoutes);
 app.use("/comments", commentRoutes);
+app.use("/profile", profileRoutes)
 
 app.use(errorHandler)
 

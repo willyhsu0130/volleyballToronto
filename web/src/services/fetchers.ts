@@ -16,6 +16,15 @@ export interface LoginData {
     };
 }
 
+export interface ProfileData {
+    _id: string;
+    username: string;
+    email: string;
+    role: "user" | "admin";
+    createdAt: string;
+    updatedAt: string;
+}
+
 export interface DropIn {
     DropInId: number;        // Unique row ID from Open Data
     LocationId: number;      // Link to Location collection
@@ -230,6 +239,34 @@ export const login = async ({
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password })
+        });
+    } catch (err: any) {
+        return { success: false, message: err.message };
+    }
+};
+
+
+// =====================================================
+// Fetch profile
+// =====================================================
+
+export const fetchProfile = async (
+    token: string | null
+): Promise<ApiResponse<ProfileData>> => {
+    try {
+        if (!token) {
+            return {
+                success: false,
+                message: "Missing token — user must be logged in."
+            };
+        }
+
+        return safeFetch<ProfileData>(`${SERVER_API}profile`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
         });
     } catch (err: any) {
         return { success: false, message: err.message };

@@ -6,11 +6,13 @@ import DropIns from "./pages/DropIns";
 import Locations from "./pages/Locations";
 import CommunityCenter from "./pages/CommunityCenter";
 import DropInProgram from "./pages/DropInProgram";
+import UserProfile from "./pages/UserProfile";
 import Login from "./pages/(auth)/Login";
 import Signup from "./pages/(auth)/SignUp";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorScreen } from "./components/errors/ErrorScreen"
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { User } from "lucide-react";
 
 const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API || "localhost:3000";
 
@@ -101,6 +103,7 @@ export default function App() {
               </div>
               <div className="text-white flex items-center gap-10 px-5">
                 <LoginButton />
+                <Link to="/profile" className="text-sm font-bold"><User /></Link>
               </div>
             </div>
 
@@ -118,6 +121,7 @@ export default function App() {
                     <Route path="/dropins/:dropInId" element={<DropInProgram />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
+                    <Route path="/profile" element={<UserProfile />} />
                   </Routes>
                 </div>
               </DropInsProvider>
