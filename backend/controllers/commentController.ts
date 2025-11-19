@@ -1,49 +1,44 @@
 import { Request, Response, NextFunction } from "express";
+import { AuthRequest } from "../middleware/authMiddleware.js";
 import { getCommentsByDropInId, updateComment } from "../services/commentService.js";
+import { AppError } from "../utils/classes.js";
+import { sendSuccess } from "../utils/helpers.js";
 
 // GET /comments/:dropInId
 export const getCommentsByDropIn = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { dropInId } = req.params;
+        if (!dropInId) throw new AppError("DropIn ID is required", 400)
 
-        if (!dropInId) {
-            return res.status(400).json({ error: "Drop In ID is required" });
-        }
+        const commentResults = await getCommentsByDropInId({ DropInId: Number(dropInId) });
+        if (!commentResults || commentResults.length === 0) return sendSuccess(res, "No comments found", 200)
 
-        const commentResults = await getCommentsByDropInId({ dropInId: Number(dropInId) });
-
-        if (!commentResults || commentResults.length === 0) {
-            return res.status(404).json({ error: "No comments found" });
-        }
-
-        return res.status(200).json(commentResults);
+        return sendSuccess(res, "Comments found", 200, commentResults)
     } catch (error) {
-        console.error("Error fetching comments:", error);
         next(error); // pass to global error handler
     }
 };
 
 // POST /comments
-export const postComment = async (req: Request, res: Response, next: NextFunction) => {
+export const postComment = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        console.log("Comments endpoint received:", req.body);
+        const { Content, DropInId } = req.body;
 
-        const { Content, DropInId, UserId } = req.body;
+        const userId = req.user?.userId;
+        if (!userId) throw new AppError("User not authenticated", 401)
 
-        // Basic validation
-        if (!Content || !DropInId || !UserId) {
-            return res.status(400).json({ error: "Missing required fields" });
-        }
+        if (!Content || !DropInId) throw new AppError("Missing required field", 400)
 
-        const response = await updateComment({ Content, DropInId, UserId });
-
-        return res.status(201).json({
-            success: true,
-            message: "Comment created successfully",
-            data: response
+        const createdComment = await updateComment({
+            Content: Content,
+            DropInId: DropInId,
+            UserId: userId
         });
+        if (!createdComment) throw new AppError("Error creating comment", 403)
+
+        return sendSuccess(res, "Comment created successfully", 201)
+
     } catch (error) {
-        console.error("Error creating comment:", error);
         next(error);
     }
 };

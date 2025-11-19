@@ -3,3 +3,11 @@ interface ApiResponse<T> {
     message?: string;
     data?: T;
 }
+
+
+export class KnownError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "KnownError";
+    }
+}

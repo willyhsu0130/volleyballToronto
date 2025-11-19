@@ -1,6 +1,6 @@
 // services/authService.ts
 import { User } from "../models/User.js";
-import { AppError } from "../utils/AppError.js";
+import { AppError } from "../utils/classes.js";
 import jwt from "jsonwebtoken";
 
 
@@ -23,11 +23,17 @@ export const signUp = async ({ username, email, password }: signupType) => {
         password: password
     })
     console.log(newUser)
-    const signUpResults = await newUser.save()
+    const user = await newUser.save()
+    const { password: _, ...userWithoutPassword } = user.toObject();
 
-    console.log("signUpResults", signUpResults)
-    return (signUpResults)
 
+    const token = jwt.sign(
+        { userId: user._id, username: user.username, role: user.role },
+        process.env.JWT_SECRET || "dev-secret",
+        { expiresIn: "1d" }
+    );
+
+    return ({ token, user: userWithoutPassword })
 }
 
 
@@ -36,7 +42,7 @@ type signinType = {
     password: string
 }
 
-export const login = async ({ username, password}: signinType) => {
+export const login = async ({ username, password }: signinType) => {
     const user = await User.findOne({ username: username }).select("+password");
     if (!user) {
         throw new AppError("Username not found", 401);
@@ -50,14 +56,14 @@ export const login = async ({ username, password}: signinType) => {
 
     const { password: _, ...userWithoutPassword } = user.toObject();
 
-  // optional JWT
-  const token = jwt.sign(
-    { id: user._id, username: user.username, role: user.role },
-    process.env.JWT_SECRET || "dev-secret",
-    { expiresIn: "1d" }
-  );
+    // optional JWT
+    const token = jwt.sign(
+        { userId: user._id, username: user.username, role: user.role },
+        process.env.JWT_SECRET || "dev-secret",
+        { expiresIn: "1d" }
+    );
 
-  // return the safe user (no Password)
-  return { token, user: userWithoutPassword };
+    // return the safe user (no Password)
+    return { token, user: userWithoutPassword };
 
 }

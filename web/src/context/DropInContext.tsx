@@ -7,8 +7,9 @@ import {
 } from "react"
 
 import { useFilters } from "./FiltersContext";
-import { useAuth } from "./AuthContext"
 import { CommentType } from "../components/Comments";
+import { fetchDropIns } from "../services/fetchers";
+import { KnownError } from "../components/classes/ErrorClass";
 
 export interface DropIn {
     DropInId: number;        // Unique row ID from Open Data
@@ -52,38 +53,39 @@ export const DropInsProvider = ({ children }: { children: ReactNode }) => {
     const { filters } = useFilters()
 
     useEffect(() => {
-        const params = new URLSearchParams()
+        const fetchData = async () => {
+            const params = new URLSearchParams()
 
-        // Turn sports into a comma seperate list
+            // Turn sports into a comma seperate list
 
-        if (Array.isArray(filters.sports) && filters.sports.length > 0) {
-            params.append("sports", filters.sports.join(","));
-        }
-        if (filters.beginDate) params.append("beginDate", filters.beginDate.toISOString());
-        if (filters.endDate) params.append("endDate", filters.endDate.toISOString());
-        if (filters.age) params.append("age", filters.age.toString());
-        if (filters.locationId) params.append("locationId", filters.locationId.toString());
-        console.log("Params", params.toString())
-
-        // Find out if filters.sports is an array of strings or a string 
-        const query = params.toString();
-        const url = `${SERVER_API}dropIns${query ? `?${query}` : ""}`;
-
-        console.log(url)
-        const fetchDropIns = async () => {
-            try {
-                const res = await fetch(url)
-                if (!res.ok) throw new Error("Failed to fetch drop-ins");
-                const data = await res.json()
-                setDropIns(data)
-                setLoading(false)
-
-            } catch (err) {
-                console.error("Error: ", err)
+            if (Array.isArray(filters.sports) && filters.sports.length > 0) {
+                params.append("sports", filters.sports.join(","));
             }
-        }
+            if (filters.beginDate) params.append("beginDate", filters.beginDate.toISOString());
+            if (filters.endDate) params.append("endDate", filters.endDate.toISOString());
+            if (filters.age) params.append("age", filters.age.toString());
+            if (filters.locationId) params.append("locationId", filters.locationId.toString());
+            console.log("Params", params.toString())
 
-        fetchDropIns()
+            // Find out if filters.sports is an array of strings or a string 
+            const query = params.toString();
+            const url = `${SERVER_API}dropIns${query ? `?${query}` : ""}`;
+
+            console.log(url)
+        
+            const result = await fetchDropIns(query);
+            if (!result.success) {
+                // your KnownError pattern
+                throw new KnownError(result.message || "Failed to load drop-ins");
+            }
+
+            if (!result.success || !result.data) {
+                throw new KnownError(result.message || "Failed to load drop-ins");
+            }
+            setLoading(false)
+            setDropIns(result.data);
+        }
+        fetchData()
     }, [filters, loading])
 
     const fetchDropInById = async (dropInId: number) => {
@@ -108,7 +110,7 @@ export const DropInsProvider = ({ children }: { children: ReactNode }) => {
             console.error("Error:", error)
         }
     }
-   
+
     const signup = async ({
         username,
         email,

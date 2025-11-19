@@ -1,39 +1,51 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { configDotenv } from "dotenv";
-
 import { Request, Response, NextFunction } from "express";
+import { AppError } from "../utils/classes.js";
 
-try {
-    configDotenv();
-} catch (err) {
-    console.error("Failed to load .env:", err);
+configDotenv();
+
+/** Shape of the JWT payload */
+export interface AuthPayload extends JwtPayload {
+    userId: string;
+    username: string;
+    role: "user" | "admin";
 }
 
-interface AuthRequest extends Request {
-    user?: string | JwtPayload;
+/** Request type extended with `user` */
+export interface AuthRequest extends Request {
+    user?: AuthPayload;
 }
 
+/** Verify JWT and inject decoded user into req.user */
 export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction) => {
-    console.log("VerifyToken called")
-    const authHeader = req.headers.authorization;
-    console.log("header", authHeader)
+    console.log("VerifyToken called");
 
+    const authHeader = req.headers.authorization;
+    console.log("header", authHeader);
+
+    // Missing Authorization header
     if (!authHeader) {
-        return res.status(401).json({ message: "No token provided" });
+        throw new AppError("No token provided", 401);
     }
 
     const token = authHeader.split(" ")[1]; // "Bearer <token>"
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
-        req.user = decoded; // attach user info to request
-        next(); // continue to the route
-    } catch (err: unknown) {
-        if (err instanceof Error) {
-            console.error("JWT verification failed:", err.message);
-        } else {
-            console.error("JWT verification failed:", err);
-        }
-        return res.status(403).json({ message: "Invalid or expired token" });
+        const decoded = jwt.verify(
+            token,
+            process.env.JWT_SECRET as string
+        ) as AuthPayload;
+        console.log("decoded", decoded)
+        // Attach fully typed user to request
+        req.user = decoded;
+
+        next();
+    } catch (err) {
+        console.error("JWT verification failed:", err);
+        return res.status(403).json({
+            success: false,
+            message: "Invalid or expired token"
+        });
     }
 };

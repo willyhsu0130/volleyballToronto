@@ -2,10 +2,15 @@ import { useState, useEffect } from "react";
 import { ThumbsUp } from "lucide-react"
 import { useAuth } from "../context/AuthContext";
 import { submitComment } from "../services/fetchers";
+import { KnownError } from "./classes/ErrorClass";
+import { useThrowAsyncError } from "../hooks/useThrowAsyncError"
+
+
 export interface CommentType {
     _id?: string;
+    Username: string;
     DropInId: number;
-    UserId: number;
+    UserId: string;
     Content: string;
     Likes?: any[];
     createdAt?: string;
@@ -18,12 +23,12 @@ interface CommentsProps {
     dropInId: number
 }
 
-
 export const Comments = ({ comments, dropInId }: CommentsProps) => {
-    const userId = 1; // temporary
     const [commentField, setCommentField] = useState("");
     const [localComments, setLocalComments] = useState(comments ?? []);
-    const { token } = useAuth()
+    const { token, user } = useAuth()
+    console.log(comments)
+    const throwAsync = useThrowAsyncError();
 
     useEffect(() => {
         if (comments) {
@@ -33,24 +38,32 @@ export const Comments = ({ comments, dropInId }: CommentsProps) => {
 
     const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => setCommentField(e.target.value);
 
-    const handleSubmitComment = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleSubmitComment = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         if (!commentField.trim()) return;
-
+        if (!user?._id) return
         const tempComment = {
             DropInId: dropInId,
-            UserId: userId,
+            UserId: user?._id,
             Content: commentField.trim(),
+            Username: user?.username
+        }
+        const submitResults = await submitComment({
+            comment: {
+                DropInId: dropInId,
+                Content: commentField.trim()
+            },
+            token
+        })
+        if (!submitResults.success) {
+            throwAsync(
+                new KnownError(submitResults.message || "Failed to submit comment")
+            );
+            return;
         }
 
         setLocalComments((prev) => [tempComment, ...prev,])
         setCommentField("");
-
-        try {
-            submitComment({ tempComment, token })
-        } catch (error) {
-            console.log(error)
-        }
     };
 
     return (
@@ -92,7 +105,7 @@ const Comment = ({ item }: { item: CommentType }) => {
                 LOGO
             </div>
             <div>
-                <p>{item.UserId}</p>
+                <p>{item.Username}</p>
                 <p>{item.Content}</p>
                 <p>{item.Likes}</p>
                 <div className="flex gap-x-2">

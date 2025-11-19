@@ -11,19 +11,22 @@ const Login = () => {
     const [password, setPassword] = useState("")
     const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
     const [message, setMessage] = useState("");
-    const { loginToken } = useAuth()
+    const { token, loginToken } = useAuth()
+
+    if (token) { navigate("/"); }
 
     const handleSubmit = async () => {
         setStatus("loading")
         setMessage("Logging in...");
 
         const loginResponse = await login({ username, password })
-        console.log(loginResponse)
+        console.log("loginResponse", loginResponse)
         if (!loginResponse.success) {
             setStatus("error");
             setMessage(loginResponse.message!);
             return;
         }
+        console.log(loginResponse)
         const { token, user } = loginResponse.data!
         console.log(token, user)
         loginToken(token, user)

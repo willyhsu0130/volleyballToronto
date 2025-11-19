@@ -1,7 +1,13 @@
 import { createContext, useState, ReactNode, useContext } from "react";
-import { jwtDecode } from "jwt-decode"
+import { KnownError } from "../components/classes/ErrorClass";
 
-type User = { username: string; email: string };
+type User = {
+    _id: string;
+    username: string;
+    email: string;
+    role: "user" | "admin";
+};
+
 type AuthContextType = {
     user: User | null;
     token: string | null;
@@ -13,9 +19,8 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [token, setToken] = useState<string | null>(localStorage.getItem("user"));
+    const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
     const [user, setUser] = useState<User | null>(
         JSON.parse(localStorage.getItem("user") || "null")
     );
@@ -66,7 +71,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {
-        throw new Error("useAuth must be used within a AuthProvider");
+        throw new KnownError("useAuth must be used within a AuthProvider");
     }
     return context;
 };

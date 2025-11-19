@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 export type CommentType = {
   DropInId: number
-  UserId: number
+  UserId: string
   Content: string
 }
 
@@ -15,7 +15,7 @@ const commentSchema = new mongoose.Schema(
     },
 
     UserId: {
-      type: Number,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true
     },

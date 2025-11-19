@@ -1,27 +1,29 @@
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom"
-import { useDropIns, DropIn } from "../context/DropInContext"
+import { DropIn } from "../context/DropInContext"
 import { Comments, CommentType } from "../components/Comments";
+import { fetchCommentsByDropInId, fetchDropInById } from "../services/fetchers";
 
 const DropInProgram = () => {
 
     const { dropInId } = useParams()
 
-    const { fetchDropInById, fetchCommentsByDropInId } = useDropIns()
     const [dropIn, setDropIn] = useState<DropIn | null>(null)
     const [comments, setComments] = useState<CommentType[]>([])
 
     useEffect(() => {
         const runFetch = async () => {
             const dropInResults = await fetchDropInById(Number(dropInId))
+            console.log(dropInResults)
+            if (dropInResults.data) setDropIn(dropInResults.data)
+
             const commentResults = await fetchCommentsByDropInId(Number(dropInId))
-            console.log("commentResults", commentResults)
-            if (dropInResults) setDropIn(dropInResults)
-            if (commentResults) setComments(commentResults)
+            console.log(commentResults)
+            if (commentResults.data) setComments(commentResults.data)
         }
         runFetch()
-    }, [fetchDropInById, fetchCommentsByDropInId, dropInId])
+    }, [dropInId])
 
     console.log(dropIn)
 

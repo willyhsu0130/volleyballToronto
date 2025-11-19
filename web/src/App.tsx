@@ -9,8 +9,8 @@ import DropInProgram from "./pages/DropInProgram";
 import Login from "./pages/(auth)/Login";
 import Signup from "./pages/(auth)/SignUp";
 import { ErrorBoundary } from "react-error-boundary";
-import { ErrorScreen} from "./components/errors/ErrorScreen"
-import { AuthProvider } from "./context/AuthContext";
+import { ErrorScreen } from "./components/errors/ErrorScreen"
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
 const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API || "localhost:3000";
 
@@ -48,35 +48,65 @@ function HomePage() {
   );
 }
 
+const LoginButton = () => {
+  const { token, logoutToken } = useAuth()
+  console.log(token)
+
+  return (
+    <div>
+      {
+        token ?
+          <button
+            onClick={logoutToken}
+          >
+            Log Out
+          </button> :
+          <Link
+            to="/login"
+          >
+            Login
+          </Link>
+      }
+    </div>
+
+  )
+
+}
+
+
+
 export default function App() {
   // Warm up server
   fetch(REACT_APP_SERVER_API).then(() => console.log("Server warmed up"));
 
   return (
+
     <div className="h-screen bg-white flex flex-col">
       <title>DropInToronto</title>
-      <Router>
-        {/* Top nav */}
-        <div className="h-[8%] flex items-center justify-between bg-black">
-          <div className="flex items-center gap-10 px-20 text-white">
-            <Link to="/" className="font-bold text-xl">DropInToronto</Link>
-            <Link to="/dropins" className="text-sm font-bold">Dropins</Link>
-            <Link to="/locations" className="text-sm font-bold">Locations</Link>
-          </div>
-          <div className="text-white flex items-center gap-10 px-5">
-            <Link to="/login" className="text-sm font-bold">Login</Link>
-          </div>
-        </div>
+      <ErrorBoundary
+        FallbackComponent={ErrorScreen}
+        onReset={() => {
+          // You can reset any state or navigation here
+          // window.location.reload();
+        }}
+      >
+        <AuthProvider>
+          <Router>
+            {/* Top nav */}
+            <div className="h-[8%] flex items-center justify-between bg-black">
+              <div className="flex items-center gap-10 px-20 text-white">
+                <Link to="/" className="font-bold text-xl">DropInToronto</Link>
+                <Link to="/dropins" className="text-sm font-bold">Dropins</Link>
+                <Link to="/locations" className="text-sm font-bold">Locations</Link>
+              </div>
+              <div className="text-white flex items-center gap-10 px-5">
+                <LoginButton />
+              </div>
+            </div>
 
-        {/* Main content */}
-        <ErrorBoundary
-          FallbackComponent={ErrorScreen}
-          onReset={() => {
-            // You can reset any state or navigation here
-            window.location.reload();
-          }}
-        >
-          <AuthProvider>
+            {/* Main content */}
+
+
             <FilterProvider>
               <DropInsProvider>
                 <div className="h-[92%] flex-1 w-full">
@@ -92,9 +122,11 @@ export default function App() {
                 </div>
               </DropInsProvider>
             </FilterProvider>
-          </AuthProvider>
-        </ErrorBoundary>
-      </Router>
+
+
+          </Router>
+        </AuthProvider>
+      </ErrorBoundary>
     </div>
   );
 }

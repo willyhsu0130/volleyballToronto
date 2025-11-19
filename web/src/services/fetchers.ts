@@ -1,12 +1,12 @@
 const SERVER_API = process.env.REACT_APP_SERVER_API;
 
-interface ApiResponse<T> {
+export interface ApiResponse<T> {
     success: boolean;
     message?: string;
     data?: T;
 }
 
-interface LoginData {
+export interface LoginData {
     token: string;
     user: {
         _id: string;
@@ -16,144 +16,192 @@ interface LoginData {
     };
 }
 
+export interface DropIn {
+    DropInId: number;        // Unique row ID from Open Data
+    LocationId: number;      // Link to Location collection
+    LocationRef?: string;    // ID reference (if applicable)
+    CourseId: number;
+    CourseTitle: string;     // Title of drop-in course
+    Section?: string;        // Section (if available)
+    AgeMin?: number | "None";         // Min age (in months)
+    AgeMax?: number | "None";         // Max age (in months)
+    BeginDate?: string;  // ISO string or Date
+    EndDate?: string;    // ISO string or Date
+    createdAt?: string | Date;  // Auto timestamp
+    updatedAt?: string | Date;
+    LocationName?: string
+}
 
-export const fetchDropInById = async (dropInId: number) => {
+// =====================================================
+// Helper to unify response handling
+// =====================================================
+const handleResponse = async <T>(res: Response): Promise<ApiResponse<T>> => {
     try {
-        // Fetch dropInData
-        const res = await fetch(`${SERVER_API}times/${dropInId}`)
-        if (!res.ok) throw new Error("Failed to fetch drop-ins");
-        const data = await res.json()
-        return data
+        const json = await res.json();
+
+        // API-level error (backend responded with success: false)
+        if (!json.success) return json as ApiResponse<T>;
+
+        // Success
+        return json as ApiResponse<T>;
     } catch (error) {
-        console.error("Error:", error)
+        // JSON parse fail or unexpected error
+        return {
+            success: false,
+            message: "Invalid response from server"
+        };
     }
-}
-export const fetchCommentsByDropInId = async (dropInId: number) => {
+};
+
+/** Safely perform a fetch with unified error handling */
+const safeFetch = async <T>(
+    url: string,
+    options?: RequestInit
+): Promise<ApiResponse<T>> => {
     try {
-        // Fetch comments data
-        const res = await fetch(`${SERVER_API}comments/${dropInId}`)
-        if (!res.ok) throw new Error("Failed to fetch comments");
-        const data = await res.json()
-        return data
-    } catch (error) {
-        console.error("Error:", error)
+        const res = await fetch(url, options);
+
+        // Network or HTTP failure
+        if (!res.ok) {
+            return {
+                success: false,
+                message: `Request failed: ${res.status}`
+            };
+        }
+
+        return handleResponse<T>(res);
+    } catch (err: any) {
+        return {
+            success: false,
+            message: err.message || "Network request failed"
+        };
     }
-}
+};
+
+// =====================================================
+// FETCH DROP-INS
+// =====================================================
+
+export const fetchDropIns = async (
+   query: string,
+): Promise<ApiResponse<DropIn[] | []>> => {
+    const url = `${SERVER_API}dropIns${query ? `?${query}` : ""}`;
+    return safeFetch<any>(url);
+};
+
+
+// =====================================================
+// FETCH DROP-IN BY ID
+// =====================================================
+export const fetchDropInById = async (
+    DropInId: number
+): Promise<ApiResponse<any>> => {
+    return safeFetch<any>(`${SERVER_API}dropIns/${DropInId}`);
+};
+
+// =====================================================
+// FETCH COMMENTS
+// =====================================================
+export const fetchCommentsByDropInId = async (
+    DropInId: number
+): Promise<ApiResponse<any>> => {
+    return safeFetch<any>(`${SERVER_API}comments/${DropInId}`);
+};
+
+// =====================================================
+// SUBMIT COMMENT
+// =====================================================
 interface ISubmitComment {
-    tempComment: {
-        DropInId: number
-        UserId: number
-        Content: string
-    },
-    token: string | null
+    comment: {
+        DropInId: number;
+        Content: string;
+    };
+    token: string | null;
 }
 
-export const submitComment = async ({ tempComment, token }: ISubmitComment) => {
-    let { DropInId, UserId, Content } = tempComment
-    console.log("token is: ", token)
-    console.log(Content, token, "submit commment")
+export const submitComment = async ({
+    comment,
+    token
+}: ISubmitComment): Promise<ApiResponse<string>> => {
     try {
-        if (!UserId) throw new Error("userId is required to comment!")
-        // Check if the dropInId, userId, text is valid.
+        const { DropInId, Content } = comment;
 
-        if (!Content || typeof Content !== "string") throw new Error("Comment must contain any texts")
-        Content = Content.trim()
+        if (!token) throw new Error("Missing token. User must login before commenting.");
+        if (!DropInId) throw new Error("Missing drop-in ID");
+        if (!Content || typeof Content !== "string")
+            throw new Error("Comment must contain text");
 
-        if (!DropInId) throw new Error("Error with dropInId")
-
-        const res = await fetch(`${SERVER_API}comments`, {
+        return safeFetch<string>(`${SERVER_API}comments`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify({
-                Content: Content,
-                DropInId: DropInId,
-                UserId: UserId
+                Content: Content.trim(),
+                DropInId,
             })
-        })
-        console.log(res)
-        if (!res.ok) throw new Error("Error commenting")
-        return {
-            success: true,
-            data: res
-        }
-
-    } catch (error: any) {
-        console.log(error)
-        return { success: false, message: error.message || "Error submitting comment" };
+        });
+    } catch (err: any) {
+        return { success: false, message: err.message };
     }
+};
 
-}
+// =====================================================
+// FETCH COMMENTS
+// ====================================================
+
+
+
+
+
+// =====================================================
+// SIGNUP
+// =====================================================
 export const signup = async ({
     username,
     email,
     password
 }: {
-    username: string
-    email: string
-    password: String
-}) => {
+    username: string;
+    email: string;
+    password: string;
+}): Promise<ApiResponse<LoginData>> => {
     try {
-        if (!username || typeof username !== "string") throw new Error("username is required to signup")
-        // Check if the dropInId, userId, text is valid.
+        if (!username) throw new Error("Username is required");
+        if (!email) throw new Error("Email is required");
+        if (!password) throw new Error("Password is required");
 
-        if (!email || typeof email !== "string") throw new Error("email is required")
-        email = email.trim()
-
-        if (!password || typeof password !== "string") throw new Error("password is required to signup")
-
-        const res = await fetch(`${SERVER_API}auth/signup`, {
+        return safeFetch<LoginData>(`${SERVER_API}auth/signup`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                username: username,
-                email: email,
-                password: password
-            })
-        })
-        console.log(res)
-        return res
-    } catch (error) {
-        console.log(error)
-        return error
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, email, password })
+        });
+    } catch (err: any) {
+        return { success: false, message: err.message };
     }
+};
 
-}
-
-export const login = async ({ username, password }: { username: string, password: string }) => {
+// =====================================================
+// LOGIN
+// =====================================================
+export const login = async ({
+    username,
+    password
+}: {
+    username: string;
+    password: string;
+}): Promise<ApiResponse<LoginData>> => {
     try {
-        if (!username || typeof username !== "string") throw new Error("Username is required to signup.")
-        // Check if the dropInId, userId, text is valid.
+        if (!username) throw new Error("Username is required");
+        if (!password) throw new Error("Password is required");
 
-        if (!password || typeof password !== "string") throw new Error("Password is required to signup")
-
-        const res = await fetch(`${SERVER_API}auth/login`, {
+        return safeFetch<LoginData>(`${SERVER_API}auth/login`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                username: username,
-                password: password
-            })
-        })
-        if (!res.ok) {
-            const err = await res.json();
-            throw new Error(err.message || "Login failed");
-        }
-        const json = await res.json()
-        return {
-            success: true,
-            data: json as LoginData
-        }
-    } catch (error: any) {
-        return {
-            success: false,
-            message: error.message
-        }
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
+        });
+    } catch (err: any) {
+        return { success: false, message: err.message };
     }
-}
+};
