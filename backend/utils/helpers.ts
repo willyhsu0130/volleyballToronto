@@ -1,5 +1,4 @@
-import { SuccessResponse } from "./classes";
-import { AppError } from "./classes";
+import { SuccessResponse } from "./classes.js";
 import { Response } from "express"
 
 export const sendSuccess = <T>(
