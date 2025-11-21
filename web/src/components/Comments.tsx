@@ -41,8 +41,13 @@ export const Comments = ({ comments, dropInId }: CommentsProps) => {
 
     const handleSubmitComment = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        if (!commentField.trim()) return;
-        if (!user?._id) return
+        if (!commentField.trim()) {
+            return throwAsync(new KnownError("Comment field must not be empty."));
+        }
+
+        if (!user?._id) {
+            return throwAsync(new KnownError("You must login before you comment."));
+        }
         const tempComment = {
             DropInId: dropInId,
             UserId: user?._id,

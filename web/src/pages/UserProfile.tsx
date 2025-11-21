@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import { fetchProfile, ProfileData } from "../services/fetchers";
 import { useAuth } from "../context/AuthContext"
+import { useNavigate } from "react-router-dom";
 
 
 
 const UserProfile = () => {
     const [profile, setProfile] = useState<ProfileData | null>(null);
     const [loading, setLoading] = useState(true);
-    const { token } = useAuth();
+    const { token, logoutToken } = useAuth();
+    const navigate = useNavigate();
 
+    if (!token) { }
     useEffect(() => {
         const fetchData = async () => {
             if (!token) {
@@ -43,6 +46,10 @@ const UserProfile = () => {
             <p className="text-sm text-gray-600 mt-4">
                 Joined: {new Date(profile.createdAt).toLocaleDateString()}
             </p>
+            <button onClick={() => {
+                logoutToken()
+                navigate("/")
+            }}>Sign Out</button>
         </div>
     );
 };

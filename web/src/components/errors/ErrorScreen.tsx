@@ -6,6 +6,7 @@ type ErrorFallbackProps = {
 };
 
 export const ErrorScreen = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
+    console.log("Error")
     const isKnown = error instanceof KnownError
 
     if (isKnown) {
@@ -15,7 +16,7 @@ export const ErrorScreen = ({ error, resetErrorBoundary }: ErrorFallbackProps) =
 
                     <h1 className="text-xl font-semibold mb-3">⚠️ Oops, something went wrong</h1>
                     <p className="text-sm text-gray-600 mb-6">
-                        {error.message || "Something didn’t load correctly."}
+                        {error.message || "Something didn't load correctly."}
                     </p>
 
                     <button

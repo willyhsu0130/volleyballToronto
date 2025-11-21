@@ -79,7 +79,7 @@ export const ResultCards = ({
 
   return (
     <div className={`${className}`}>
-      <p className="text-white">{displayMessage()}</p>
+      <div className="text-white">{displayMessage()}</div>
       {
         dropIns?.map((item, index) => (
           <ResultCard item={item} key={index} linkToLocation={linkToLocation} />

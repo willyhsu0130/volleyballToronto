@@ -12,6 +12,8 @@ import Signup from "./pages/(auth)/SignUp";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorScreen } from "./components/errors/ErrorScreen"
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import ProtectedRoutes from "./components/auth/ProtectedRoutes"
+
 import { User } from "lucide-react";
 
 const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API || "localhost:3000";
@@ -51,18 +53,14 @@ function HomePage() {
 }
 
 const LoginButton = () => {
-  const { token, logoutToken } = useAuth()
+  const { token } = useAuth()
   console.log(token)
 
   return (
     <div>
       {
         token ?
-          <button
-            onClick={logoutToken}
-          >
-            Log Out
-          </button> :
+          <Link to="/profile" className="text-sm font-bold"><User /></Link> :
           <Link
             to="/login"
           >
@@ -103,7 +101,6 @@ export default function App() {
               </div>
               <div className="text-white flex items-center gap-10 px-5">
                 <LoginButton />
-                <Link to="/profile" className="text-sm font-bold"><User /></Link>
               </div>
             </div>
 
@@ -121,7 +118,7 @@ export default function App() {
                     <Route path="/dropins/:dropInId" element={<DropInProgram />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
-                    <Route path="/profile" element={<UserProfile />} />
+                    <Route path="/profile" element={<ProtectedRoutes><UserProfile /></ProtectedRoutes>} />
                   </Routes>
                 </div>
               </DropInsProvider>
