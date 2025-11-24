@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { getLocations, getLocation } from "../services/locationService.js";
 import { sendSuccess } from "../utils/helpers.js";
+import { AppError } from "../utils/classes.js";
 
 // GET /locations
 export const getLocationsList = async (
@@ -22,8 +23,7 @@ export const getLocationsList = async (
 
     sendSuccess(res, "Locations Retrieved", 200, results)
   } catch (error) {
-    console.error("Error fetching locations list:", error);
-    next(error);
+    throw new AppError("Location not retreived", 404)
   }
 };
 
@@ -40,10 +40,10 @@ export const getLocationById = async (req: Request, res: Response, next: NextFun
     const result = await getLocation({ locationId: Number(locationId) });
 
     if (!result) {
-      return res.status(404).json({ error: "Community center not found" });
+      throw new AppError("Community Center not found", 404)
     }
 
-    return res.status(200).json(result);
+    sendSuccess(res, "LocationById Retrived", 200, result)
   } catch (error) {
     console.error("Error fetching community center:", error);
     next(error);

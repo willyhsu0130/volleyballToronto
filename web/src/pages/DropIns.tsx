@@ -115,15 +115,15 @@ const SearchBar = ({ className }: { className: string }) => {
           placeholder="Age"
           type="number"
           min="6"
-          className="flex-1 px-2 py-2 border rounded"
+          className="w-[10%] px-2 py-2 border rounded"
           onChange={(e) => setFilters((prev) => ({ ...prev, age: Number(e.target.value) }))}
         />
 
-        <input name="beginDate" type="date" className="flex-1 px-2 py-2 border rounded" onChange={handleDateChange} />
-        <input name="endDate" type="date" className="flex-1 px-2 py-2 border rounded" onChange={handleDateChange} />
+        <input name="beginDate" type="date" className="w-[20%] px-2 py-2 border rounded" onChange={handleDateChange} />
+        <input name="endDate" type="date" className="w-[20%]  px-2 py-2 border rounded" onChange={handleDateChange} />
 
         <button
-          className="flex-1 px-2 py-2 border rounded bg-white hover:bg-gray-200"
+          className="w-[50%] px-2 py-2 border rounded bg-white hover:bg-gray-200"
           onClick={() => setIsLocationMenuOpen(true)}
         >
           {selectedLocationName || "Select Location"}

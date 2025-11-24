@@ -1,18 +1,20 @@
 import { Location } from "../models/Location.js";
-export const getLocations = async ({ q, nameOnly }) => {
-    // Build filter object
-    const filter = q
-        ? { LocationName: { $regex: q, $options: "i" } } // case-insensitive search
-        : {};
+export const getLocations = async ({ q, nameOnly, }) => {
+    const filter = {};
+    // Only match by q when provided
+    if (q) {
+        filter.LocationName = { $regex: q, $options: "i" };
+    }
+    // Only restrict to CRCs if that is your desired behavior
+    // Otherwise remove this line
+    filter.LocationType = "crc";
     // Base query
     let query = Location.find(filter);
-    // If we only want name + id
     if (nameOnly) {
-        query = query.select("LocationName _id");
-        // Or "LocationName LocationId" if you have your own LocationId field
+        query = query.select("LocationName LocationId");
+        //       👆 include LocationId, NOT _id — based on your UI
     }
-    // Limit results to avoid returning all 35k
-    const results = await query.limit(50).lean();
+    const results = await query.lean();
     return results;
 };
 export const getLocation = async ({ locationId }) => {

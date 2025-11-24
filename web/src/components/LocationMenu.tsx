@@ -10,11 +10,12 @@ export interface LocationNameOnly {
 export const LocationMenu = ({
   open,
   onClose,
-  onSelect
+  onSelect,
 }: {
   open: boolean;
   onClose: () => void;
   onSelect: (location: LocationNameOnly) => void;
+
 }) => {
 
   const [locations, setLocations] = useState<LocationNameOnly[]>([]);

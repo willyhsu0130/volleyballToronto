@@ -5,6 +5,7 @@ import { CalendarSchedule } from "../components/CalendarSchedule"
 import { GoogleMapsEmbed } from "../components/GoogleMaps"
 import { useFilters } from "../context/FiltersContext"
 import { useDropIns } from "../context/DropInContext"
+import { fetchLocationById } from "../services/fetchers"
 
 const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API
 
@@ -31,31 +32,20 @@ const CommunityCenter = () => {
     const { communityCenterId } = useParams()
     const [error, setError] = useState<string | null>(null)
     const [communityCenterData, setCommunityCenterData] = useState<CommunityCenterType | null>(null)
-    const { loading } = useDropIns()
+    const [loading, setLoading] = useState(true)
     const { setLocationId } = useFilters()
 
     useEffect(() => {
         if (!communityCenterId) return // safety check
 
         const fetchCommunityCenter = async () => {
-            try {
-                // Fetch Community Center Locations
-                const url = `${REACT_APP_SERVER_API}locations/${communityCenterId}`
-                const res = await fetch(url)
-                if (!res.ok) throw new Error("Failed to fetch community center data")
-
-                const data = await res.json()
-                setCommunityCenterData(data)
-
-                console.log("Data fetched:", data)
-            } catch (err) {
-                console.error(err)
-                setError("Error retrieving data")
-            }
+            const response = await fetchLocationById(Number(communityCenterId))
+            if (response.data) setCommunityCenterData(response.data)
+            setLoading(false)
         }
-        setLocationId(Number(communityCenterId))
+
         fetchCommunityCenter()
-    }, [communityCenterId, setLocationId])
+    }, [communityCenterId])
 
 
     const isStillLoading = !communityCenterData || loading || error;
@@ -69,14 +59,14 @@ const CommunityCenter = () => {
     return (
         <div className="flex flex-col min-h-screen overflow-y-auto">
             <div className="h-[15%] p-5 bg-gray-300 ">
-                <h1 className="text-[35px] font-bold">{communityCenterData.LocationName}</h1>
+                <h1 className="text-[35px] font-bold">{communityCenterData?.LocationName}</h1>
                 <p className="text-gray-700 leading-relaxed">
                     <span className="font-semibold"></span>{" "}
-                    {communityCenterData.StreetNo}{" "}
-                    {communityCenterData.StreetName}{" "}
-                    {communityCenterData.StreetType},{" "}
-                    {communityCenterData.PostalCode},{" "}
-                    {communityCenterData.District}
+                    {communityCenterData?.StreetNo}{" "}
+                    {communityCenterData?.StreetName}{" "}
+                    {communityCenterData?.StreetType},{" "}
+                    {communityCenterData?.PostalCode},{" "}
+                    {communityCenterData?.District}
                 </p>
             </div>
             {communityCenterData &&

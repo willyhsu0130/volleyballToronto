@@ -299,18 +299,31 @@ export const fetchProfile = async (
 // =====================================================
 
 export const fetchLocations = async (
-  nameOnly: boolean,
-  q?: string
+    nameOnly: boolean,
+    q?: string
 ): Promise<ApiResponse<Location[]>> => {
 
-  const params = new URLSearchParams();
-  params.set("nameOnly", nameOnly ? "true" : "false");
-  if (q) params.set("q", q);
+    const params = new URLSearchParams();
+    params.set("nameOnly", nameOnly ? "true" : "false");
+    if (q) params.set("q", q);
 
-  return safeFetch<Location[]>(
-    `${SERVER_API}locations?${params.toString()}`,
-    {
-      method: "GET",
-    }
-  );
+    return safeFetch<Location[]>(
+        `${SERVER_API}locations?${params.toString()}`,
+        {
+            method: "GET",
+        }
+    );
 };
+
+export const fetchLocationById = async (
+    locationId: number
+): Promise<ApiResponse<Location>> => {
+    try {
+        // Fetch Community Center Locations
+        const url = `${SERVER_API}locations/${locationId}`
+        return safeFetch(url)
+
+    } catch (err: any) {
+        return { success: false, message: err.message };
+    }
+}
