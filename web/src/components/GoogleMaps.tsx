@@ -23,9 +23,16 @@ export const GoogleMaps = ({ address, className }: { address: string, className:
       <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
         {coords ? (
           <Map
-            zoom={15}
+            zoom={12}
             center={coords}
             style={{ width: "100%", height: "400px" }}
+            gestureHandling="greedy"        // enables dragging + scroll
+            scrollwheel={true}              // enable zoom with wheel
+            disableDoubleClickZoom={false}
+            keyboardShortcuts={true}
+            zoomControl={true}
+            mapTypeControl={true}
+            streetViewControl={false}
           >
             <Marker position={coords} />
           </Map>
