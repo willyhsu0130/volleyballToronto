@@ -39,7 +39,7 @@ interface DropInsContextType {
         username: string
         email: string
         password: string
-    }) => void
+    }) => void,
 }
 
 const SERVER_API = process.env.REACT_APP_SERVER_API;
@@ -72,7 +72,7 @@ export const DropInsProvider = ({ children }: { children: ReactNode }) => {
             const url = `${SERVER_API}dropIns${query ? `?${query}` : ""}`;
 
             console.log(url)
-        
+
             const result = await fetchDropIns(query);
             if (!result.success) {
                 // your KnownError pattern
@@ -155,7 +155,7 @@ export const DropInsProvider = ({ children }: { children: ReactNode }) => {
             setLoading,
             fetchDropInById,
             fetchCommentsByDropInId,
-            signup
+            signup,
         }}>
             {children}
         </DropInsContext.Provider>

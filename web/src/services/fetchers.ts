@@ -25,6 +25,26 @@ export interface ProfileData {
     updatedAt: string;
 }
 
+export interface Location {
+    _id: string;
+    LocationId: number;
+    Accessibility?: string;
+    Description?: string;
+    District?: string;
+    Intersection?: string;
+    LocationName: string;
+    LocationType?: string;
+    PostalCode?: string;
+    StreetDirection?: string;
+    StreetName?: string;
+    StreetNo?: string;
+    StreetNoSuffix?: string;
+    StreetType?: string;
+    TTCInformation?: string;
+    __v?: number;
+}
+
+
 export interface DropIn {
     DropInId: number;        // Unique row ID from Open Data
     LocationId: number;      // Link to Location collection
@@ -271,4 +291,26 @@ export const fetchProfile = async (
     } catch (err: any) {
         return { success: false, message: err.message };
     }
+};
+
+
+// =====================================================
+// Fetch all locations
+// =====================================================
+
+export const fetchLocations = async (
+  nameOnly: boolean,
+  q?: string
+): Promise<ApiResponse<Location[]>> => {
+
+  const params = new URLSearchParams();
+  params.set("nameOnly", nameOnly ? "true" : "false");
+  if (q) params.set("q", q);
+
+  return safeFetch<Location[]>(
+    `${SERVER_API}locations?${params.toString()}`,
+    {
+      method: "GET",
+    }
+  );
 };

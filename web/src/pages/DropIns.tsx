@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ResultCards } from "../components/ResultCards";
 import { CalendarSchedule } from "../components/CalendarSchedule";
 import { FilterChips } from "../components/FilterChips"
 import { useFilters } from "../context/FiltersContext";
-
-const REACT_APP_SERVER_API = process.env.REACT_APP_SERVER_API;
+import { LocationMenu } from "../components/LocationMenu";
 
 const DropIns = () => {
   const [searchParams] = useSearchParams();
+
 
   // Let sports FromUrl always an array. If it's singular, we use [{value}]
   let sportsFromUrl
@@ -33,12 +33,12 @@ const DropIns = () => {
 };
 
 
-
-
 const SearchBar = ({ className }: { className: string }) => {
 
   const { setFilters } = useFilters()
   const [searchInput, setSearchInput] = useState<string>()
+  const [isLocationMenuOpen, setIsLocationMenuOpen] = useState(false);
+  const [selectedLocationName, setSelectedLocationName] = useState<string>("");
 
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(e.target.value)
@@ -122,14 +122,26 @@ const SearchBar = ({ className }: { className: string }) => {
         <input name="beginDate" type="date" className="flex-1 px-2 py-2 border rounded" onChange={handleDateChange} />
         <input name="endDate" type="date" className="flex-1 px-2 py-2 border rounded" onChange={handleDateChange} />
 
-        <select
-          name="location"
-          className="flex-1 px-2 py-2 border rounded"
-          onChange={(e) => setFilters((prev) => ({ ...prev, location: e.target.value }))}
+        <button
+          className="flex-1 px-2 py-2 border rounded bg-white hover:bg-gray-200"
+          onClick={() => setIsLocationMenuOpen(true)}
         >
-          <option value="">Location</option>
-        </select>
+          {selectedLocationName || "Select Location"}
+        </button>
       </div>
+      <LocationMenu
+        open={isLocationMenuOpen}
+        onClose={() => setIsLocationMenuOpen(false)}
+        onSelect={(locationObj) => {
+          setSelectedLocationName(locationObj.LocationName);
+
+          // send to FiltersContext
+          setFilters((prev) => ({
+            ...prev,
+            locationId: locationObj.LocationId,   // we use ID for filtering
+          }));
+        }}
+      />
     </div>
   );
 };

@@ -55,7 +55,7 @@ const CommunityCenter = () => {
         }
         setLocationId(Number(communityCenterId))
         fetchCommunityCenter()
-    }, [communityCenterId])
+    }, [communityCenterId, setLocationId])
 
 
     const isStillLoading = !communityCenterData || loading || error;

@@ -111,11 +111,6 @@ const Comment = ({ item }: { item: CommentType }) => {
     const [likesCount, setLikesCount] = useState(item.LikesCount);
     const { token } = useAuth();
 
-    const thumbStyle = () => {
-        if (liked) return "blue"
-        return "black"
-    }
-
     const handleToggleLike = async () => {
         if (!token) return alert("Please login to like comments");
 

@@ -73,11 +73,7 @@ const LoginButton = () => {
 
 }
 
-
-
 export default function App() {
-  // Warm up server
-  fetch(REACT_APP_SERVER_API).then(() => console.log("Server warmed up"));
 
   return (
 
@@ -123,7 +119,6 @@ export default function App() {
                 </div>
               </DropInsProvider>
             </FilterProvider>
-
 
           </Router>
         </AuthProvider>

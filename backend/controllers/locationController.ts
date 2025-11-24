@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { getLocations, getLocation } from "../services/locationService.js";
+import { sendSuccess } from "../utils/helpers.js";
 
 // GET /locations
 export const getLocationsList = async (
@@ -19,7 +20,7 @@ export const getLocationsList = async (
       nameOnly: nameFlag,
     });
 
-    res.status(200).json(results);
+    sendSuccess(res, "Locations Retrieved", 200, results)
   } catch (error) {
     console.error("Error fetching locations list:", error);
     next(error);
