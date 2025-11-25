@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchLocations } from "../services/fetchers";
-import { GoogleMaps } from "./GoogleMaps";
+import { GoogleMaps, GoogleMapsEmbed } from "./GoogleMaps";
 
 // Minimal type used by the popup
 export interface LocationNameOnly {
@@ -57,7 +57,11 @@ export const LocationMenu = ({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="h-[20%]">
-          <h2 className="text-xl font-semibold mb-4">Select a Location</h2>
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold mb-4">Select a Location</h2>
+            <button onClick={onClose}>x</button>
+          </div>
+
 
           {/* Search bar */}
           <input
@@ -68,10 +72,9 @@ export const LocationMenu = ({
           />
         </div>
 
-        <div className="flex h-full gap-x-3">
-          <div className="w-3/5 h-[80%] overflow-y-auto">
+        <div className="flex h-[80%]  gap-x-3">
+          <div className="w-3/5 overflow-y-auto">
             <ul className="flex flex-col gap-2">
-
               <li>
                 <button
                   className="w-full text-left px-3 py-2 rounded hover:bg-gray-200 border border-gray-300 font-semibold"
@@ -108,7 +111,7 @@ export const LocationMenu = ({
               )}
             </ul>
           </div>
-          <GoogleMaps address={hoverLocation} className="w-full pointer-events-auto touch-pan-y" />
+          <GoogleMapsEmbed address={hoverLocation} className="w-full h-full" />
         </div>
 
 

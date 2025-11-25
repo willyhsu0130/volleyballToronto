@@ -30,11 +30,17 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.dropintoronto"
     },
     "extra": {
       "SERVER_API": "https://volleyballtoronto.onrender.com/",
-      "ENV": "development"
-    }
+      "ENV": "development",
+      "router": {},
+      "eas": {
+        "projectId": "337b7dec-33df-49c0-99a8-8faea7136d93"
+      }
+    },
+    "owner": "willyhsu0130"
   }
 }
