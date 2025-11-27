@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ResultCards } from "../components/ResultCards";
-import { CalendarSchedule } from "../components/CalendarSchedule";
 import { FilterChips } from "../components/FilterChips"
 import { useFilters } from "../context/FiltersContext";
 import { LocationMenu } from "../components/LocationMenu";
+import { DropIn } from "../components/DropIn"
 
 const DropIns = () => {
+
   const [searchParams] = useSearchParams();
+  const [selectedDropInId, setSelectedDropInId] = useState<number | undefined>(1)
 
 
   // Let sports FromUrl always an array. If it's singular, we use [{value}]
@@ -25,8 +27,9 @@ const DropIns = () => {
     <div className="h-full flex flex-col bg-black">
       <SearchBar className="bg-white h-[10%] flex items-center gap-4 px-5" />
       <div className="h-[90%] w-screen flex">
-        <ResultCards className="w-[40%] h-full p-3 overflow-y-auto flex flex-col gap-y-3" linkToLocation />
-        <CalendarSchedule className="w-[60%] flex flex-col bg-white p-5 items-center justify-center font-bold" />
+        <ResultCards className="w-[40%] h-full p-3 overflow-y-auto flex flex-col gap-y-3" setSelect={setSelectedDropInId} linkToLocation />
+        <DropIn dropInId={selectedDropInId} className="w-[60%] gap-y-3 bg-white flex flex-col p-3 overflow-y-scroll"/>
+        {/* <CalendarSchedule className="w-[60%] flex flex-col bg-white p-5 items-center justify-center font-bold" /> */}
       </div>
     </div>
   );
@@ -46,7 +49,7 @@ const SearchBar = ({ className }: { className: string }) => {
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const utcDate = new Date(`${value}T00:00:00-04:00`).toISOString();
+    const utcDate = new Date(`${value}T00:00:00-04:00`)
 
     setFilters((prev) => ({
       ...prev,
@@ -109,13 +112,13 @@ const SearchBar = ({ className }: { className: string }) => {
         >Add Filter</button>
       </div>
 
-      <div className="w-[60%] flex gap-3">
+      <div className="w-[60%] flex gap-3 justify-center">
         <input
           name="age"
           placeholder="Age"
           type="number"
           min="6"
-          className="w-[10%] px-2 py-2 border rounded"
+          className="w-[10%] px-2 py-2 border rounded items-center justify-center"
           onChange={(e) => setFilters((prev) => ({ ...prev, age: Number(e.target.value) }))}
         />
 

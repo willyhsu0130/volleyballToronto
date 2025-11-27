@@ -1,4 +1,5 @@
 // src/services/torontoData.ts
+import fs from "fs";
 import https from "https";
 // ---------- Fetch helper ----------
 function fetchJSON(url) {
@@ -85,18 +86,58 @@ function transformLocationRecords(records) {
 }
 // ---------- Main fetch ----------
 const packageId = "1a5be46a-4039-48cd-a2d2-8e702abf9516";
+const fetchAllRecords = async (resourceId) => {
+    const limit = 5000;
+    let offset = 0;
+    let all = [];
+    while (true) {
+        const url = `https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/datastore_search`
+            + `?id=${resourceId}&limit=${limit}&offset=${offset}`;
+        const res = await fetchJSON(url);
+        const batch = res?.result?.records ?? [];
+        all.push(...batch);
+        if (batch.length < limit)
+            break; // no more pages
+        offset += limit;
+    }
+    return all;
+};
 export async function getTorontoData() {
     // 1) package
     const pkg = await fetchJSON(`https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/package_show?id=${packageId}`);
-    const resources = pkg.result.resources.filter((r) => r.datastore_active);
+    // const resources = pkg.result.resources.filter((r) => r.datastore_active);
+    // if (resources.length < 2) {
+    //   throw new Error("Not enough active datastore resources in package.");
+    // }
+    // // NOTE: adjust indices if you want to target a specific table reliably
+    // const dropsRes = await fetchJSON<CKANDatastoreResponse<Record<string, unknown>>>(
+    //   `https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/datastore_search?id=${resources[1].id}&limit=5000`
+    // );
+    // const locsRes = await fetchJSON<CKANDatastoreResponse<Record<string, unknown>>>(
+    //   `https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/datastore_search?id=${resources[0].id}&limit=5000`
+    // );
+    // return {
+    //   APIdropResults: transformDropRecords(dropsRes.result.records),
+    //   APIlocationResults: transformLocationRecords(locsRes.result.records),
+    // };
+    const resources = pkg.result.resources.filter(r => r.datastore_active);
     if (resources.length < 2) {
-        throw new Error("Not enough active datastore resources in package.");
+        throw new Error("Not enough datastore-active resources in Toronto dataset");
     }
-    // NOTE: adjust indices if you want to target a specific table reliably
-    const dropsRes = await fetchJSON(`https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/datastore_search?id=${resources[1].id}&limit=5000`);
-    const locsRes = await fetchJSON(`https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/datastore_search?id=${resources[0].id}&limit=5000`);
-    return {
-        APIdropResults: transformDropRecords(dropsRes.result.records),
-        APIlocationResults: transformLocationRecords(locsRes.result.records),
-    };
+    // IMPORTANT: ensure your index order is correct
+    const dropResourceId = resources[1].id;
+    const locationResourceId = resources[0].id;
+    // 3) Fetch ALL records (no limit)
+    const dropRecordsRaw = await fetchAllRecords(dropResourceId);
+    const locationRecordsRaw = await fetchAllRecords(locationResourceId);
+    // 4) Transform
+    const APIdropResults = transformDropRecords(dropRecordsRaw);
+    const APIlocationResults = transformLocationRecords(locationRecordsRaw);
+    fs.writeFileSync("./torontoDataDump.json", JSON.stringify({
+        dropResults: APIdropResults,
+        locationResults: APIlocationResults
+    }, null, 2 // pretty-print JSON with indentation
+    ));
+    console.log("Saved Toronto data → torontoDataDump.json");
+    return { APIdropResults, APIlocationResults };
 }

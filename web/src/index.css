@@ -17,3 +17,40 @@ code {
     monospace;
 }
 
+
+:root {
+  --bg-dark: oklch(0.92 0.015 41);
+  --bg: oklch(0.96 0.015 41);
+  --bg-light: oklch(1 0.015 41);
+  --text: oklch(0.15 0.03 41);
+  --text-muted: oklch(0.4 0.03 41);
+  --highlight: oklch(1 0.03 41);
+  --border: oklch(0.6 0.03 41);
+  --border-muted: oklch(0.7 0.03 41);
+  --primary: oklch(0.4 0.1 41);
+  --secondary: oklch(0.4 0.1 221);
+  --danger: oklch(0.5 0.05 30);
+  --warning: oklch(0.5 0.05 100);
+  --success: oklch(0.5 0.05 160);
+  --info: oklch(0.5 0.05 260);
+}
+
+/* 🌙 Dark mode (when OS or class is dark) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-dark: oklch(0.1 0.015 41);
+    --bg: oklch(0.15 0.015 41);
+    --bg-light: oklch(0.2 0.015 41);
+    --text: oklch(0.96 0.03 41);
+    --text-muted: oklch(0.76 0.03 41);
+    --highlight: oklch(0.5 0.03 41);
+    --border: oklch(0.4 0.03 41);
+    --border-muted: oklch(0.3 0.03 41);
+    --primary: oklch(0.76 0.1 41);
+    --secondary: oklch(0.76 0.1 221);
+    --danger: oklch(0.7 0.05 30);
+    --warning: oklch(0.7 0.05 100);
+    --success: oklch(0.7 0.05 160);
+    --info: oklch(0.7 0.05 260);
+  }
+}

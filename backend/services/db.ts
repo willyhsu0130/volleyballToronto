@@ -68,21 +68,34 @@ export async function connectDB(): Promise<{ dropResult: Record<string, never> }
 }
 
 // ---------- Merge Date and Time ----------
-const dateDataMerge = ({ date, hour, minute }: IDateData): Date | null => {
-  if (!date) {
-    console.error("Missing date:", { date, hour, minute });
-    return null;
-  }
+export const dateDataMerge = ({ date, hour, minute }: {
+    date: string
+    hour: number | null
+    minute: number | null
 
-  const baseDate = new Date(date);
-  if (isNaN(baseDate.getTime())) {
-    console.error("Invalid base date:", date);
-    return null;
-  }
+}) => {
+    if (!date) return null
+    if (hour == null) return null;
 
-  baseDate.setHours(hour ?? 0, minute ?? 0, 0, 0);
-  return baseDate;
-};
+    if (minute == null) minute = 0;
+
+    const [y, m, d] = date.split("-").map(Number);
+    if (!y || !m || !d) return null;
+
+    const hh = Number(hour);
+    const mm = Number(minute);
+
+    const torontoString = `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(
+        2,
+        "0"
+    )} ${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`;
+
+    const parsed = new Date(
+        torontoString
+    );
+    return parsed
+
+}
 
 // ---------- Update DB from Toronto API ----------
 export const updateFromToronto = async (): Promise<string | void> => {
@@ -131,19 +144,24 @@ export const updateFromToronto = async (): Promise<string | void> => {
   // --- Update DropIns ---
   const updateDBDropIn = async (): Promise<void> => {
     try {
-      for (const drop of APIdropResults as IAPIDropResult[]) {
+      for (let i = 0; i < APIdropResults.length; i++) {
+        const drop = APIdropResults[i];
+        console.log(`Updating drop-in ${i + 1} / ${APIdropResults.length}`);
+
         const beginDate = dateDataMerge({
           date: drop.FirstDate,
           hour: drop.StartHour,
-          minute: drop.StartMinute,
+          minute: drop.StartMinute || 0,
         });
+
         const endDate = dateDataMerge({
           date: drop.LastDate,
           hour: drop.EndHour,
-          minute: drop.EndMinute,
+          minute: drop.EndMinute || 0,
         });
 
         const locationDoc = await Location.findOne({ LocationId: drop.LocationID });
+
         await DropIn.updateOne(
           { DropInId: drop.id },
           {
@@ -169,8 +187,8 @@ export const updateFromToronto = async (): Promise<string | void> => {
     }
   };
 
-  await updateDBLocation();
-  console.log("✅ Locations updated");
+  // await updateDBLocation();
+  // console.log("✅ Locations updated");
 
   await updateDBDropIn();
   console.log("✅ Drop-ins updated");

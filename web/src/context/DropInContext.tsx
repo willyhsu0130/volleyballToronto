@@ -61,7 +61,7 @@ export const DropInsProvider = ({ children }: { children: ReactNode }) => {
             if (Array.isArray(filters.sports) && filters.sports.length > 0) {
                 params.append("sports", filters.sports.join(","));
             }
-            if (filters.beginDate) params.append("beginDate", filters.beginDate.toISOString());
+            if (filters.beginDate && filters.beginDate ) params.append("beginDate", filters.beginDate.toISOString());
             if (filters.endDate) params.append("endDate", filters.endDate.toISOString());
             if (filters.age) params.append("age", filters.age.toString());
             if (filters.locationId) params.append("locationId", filters.locationId.toString());
@@ -74,6 +74,7 @@ export const DropInsProvider = ({ children }: { children: ReactNode }) => {
             console.log(url)
 
             const result = await fetchDropIns(query);
+            
             if (!result.success) {
                 // your KnownError pattern
                 throw new KnownError(result.message || "Failed to load drop-ins");

@@ -46,8 +46,8 @@ const dropInSchema = new mongoose.Schema({
   Section: { type: String },                           // Section (if available)
   AgeMin: { type: Number },                            // Min age (in months)
   AgeMax: { type: Number },                            // Max age (in months)
-  BeginDate: { type: Date },                           // First date course runs
-  EndDate: { type: Date },                         // Last date course runs
+  BeginDate: { type: Date || null },                           // First date course runs
+  EndDate: { type: Date || null},                         // Last date course runs
 }, {
   timestamps: true,
   toJSON: { virtuals: true, transform: docTransform },
